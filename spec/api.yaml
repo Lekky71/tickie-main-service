@@ -1,0 +1,245 @@
+openapi: 3.0.0
+info:
+  title: Tickie API Docs
+  version: 1.0.0
+  description: bla bla bla
+
+paths:
+  /user/auth/otp-request:
+    post:
+      summary: "Signup: OTP Request"
+      tags:
+        - onboarding
+      operationId: SignupOTPRequest
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SignupOTPRequestDto"
+        required: true
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DefaultResponse"
+        '400':
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+
+  /user/auth/otp-verify/signup:
+    post:
+      tags:
+        - onboarding
+      operationId: SignUpOTPVerify
+      summary: 'Endpoint to receive OTP sent to user email'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SignupVerifyOtpRequest'
+      responses:
+        200:
+          description: 'Successful verification, a jwt token valid for 1 hour is returned so that client can send in user signup information'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenResponse'
+
+  /user/auth/signup:
+    post:
+      tags:
+        - onboarding
+      operationId: SignUpUserInfo
+      summary: 'Save new user information'
+      parameters:
+        - name: x-auth-token
+          in: header
+          description: 'JWT token returned from OTP verification'
+          required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SignUpUserInfoRequest'
+      responses:
+        200:
+          description: 'Success'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        401:
+          $ref: '#/components/responses/ErrorResponse401'
+
+  /user/auth/login:
+    post:
+      tags:
+        - onboarding
+      operationId: LoginUser
+      summary: 'Login User'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        200:
+          description: 'Success'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        400:
+          description: 'Bad request'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                example:
+                  { "message": "Invalid Login details" }
+
+  /user/me:
+    get:
+      summary: 'Get user details'
+      tags:
+        - user
+      parameters:
+        - $ref: '#/components/parameters/AuthToken'
+      responses:
+        200:
+          description: 'Success'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+
+components:
+  parameters:
+    UserID:
+      name: userId
+      in: path
+      schema:
+        type: string
+      required: true
+    AuthToken:
+      name: x-auth-token
+      in: header
+      schema:
+        type: string
+      required: true
+  responses:
+    ErrorResponse401:
+      description: 'Invalid JWT token'
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+            example:
+              { "message": "Invalid JWT token" }
+
+  schemas:
+    TicketTypeEnum:
+      type: string
+      enum:
+        - show
+        - concert
+        - dinner
+
+    SignupOTPRequestDto:
+      title: SignupOTPRequestDto
+      example:
+        email: hashilekky@gmail.com
+      type: object
+      properties:
+        email:
+          type: string
+      required:
+        - email
+
+    SignupVerifyOtpRequest:
+      type: object
+      properties:
+        email:
+          type: string
+        otp:
+          type: string
+
+    TokenResponse:
+      type: object
+      properties:
+        token:
+          type: string
+    DefaultResponse:
+      title: DefaultResponse
+      type: object
+      properties:
+        message:
+          type: string
+      required:
+        - message
+
+    ErrorResponse:
+      title: DefaultResponse
+      type: object
+      properties:
+        error:
+          type: string
+        message:
+          type: string
+      required:
+        - message
+
+    User:
+      type: object
+      required:
+        - id
+        - fullName
+        - email
+      properties:
+        id:
+          type: string
+        fullName:
+          type: string
+        email:
+          type: string
+          format: email
+      example:
+        id: sdgweqgwerg
+        fullName: Myke Dunsimi
+        email: user@example.com
+
+    SignUpUserInfoRequest:
+      type: object
+      required:
+        - password
+        - fullName
+      properties:
+        password:
+          type: string
+        fullName:
+          type: string
+
+    LoginRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+        password:
+          type: string
