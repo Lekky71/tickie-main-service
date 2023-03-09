@@ -85,6 +85,9 @@ paths:
         - onboarding
       operationId: LoginUser
       summary: 'Login User'
+      parameters:
+         - name: deviceId
+           in: header
       requestBody:
         content:
           application/json:
@@ -97,7 +100,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/User'
-        400:
+        401:
           description: 'Bad request'
           content:
             application/json:
@@ -108,6 +111,19 @@ paths:
                     type: string
                 example:
                   { "message": "Invalid Login details" }
+        400: 
+          description: 'Device not recognised'
+          content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    message:
+                      type: string
+                    OTP:
+                      type: integer
+                  example:
+                    {"message":"Device not recognised, enter OTP to verify device","OTP":"OTP"}        
 
   /user/me:
     get:
@@ -155,7 +171,8 @@ paths:
                        type: string
                    example:
                       { "message": "User not found" }      
-
+    
+    
 components:
   parameters:
     UserID:
