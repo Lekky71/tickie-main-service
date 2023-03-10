@@ -55,10 +55,10 @@ router.use(ApiRoutes);
 
 app.use(router);
 
-console.log(swaggerSpec);
+// console.log(swaggerSpec);
 
 // Force all requests on production to be served over https
-app.use(function (req, res, next) {
+app.use(function(req, res, next) {
   if (req.headers['x-forwarded-proto'] !== 'https' && isProduction) {
     const secureUrl = 'https://' + req.hostname + req.originalUrl;
     res.redirect(302, secureUrl);

@@ -124,6 +124,150 @@ paths:
               schema:
                 $ref: '#/components/schemas/User'
 
+  /user/auth/forgot-password:
+    post:
+      summary: 'Send Forgot password Email OTP'
+      tags:
+        - onboarding
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ForgotPasswordRequestDto'
+      responses:
+          200:
+            description: 'Success'
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/DefaultSuccessResponse200'
+          404:
+            description: 'Not found Request'
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorResponse404'
+
+
+  /user/auth/otp-verify/forgot-password:
+    post:
+      summary: 'verify password reset otp'
+      tags:
+       - onboarding
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/verifyForgetPasswordPRequestDto'
+      responses:
+        200:
+          description: 'success'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: string
+                  userId : string
+                example :
+                  {"message":"success", "userId":"62c2391994184ejdwf"}
+        400:
+          description: 'Bad request'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                example:
+                  { "message": "otp expired of invalid" }
+
+  /user/auth/reset-password{userId}:
+    post:
+      summary: 'reset forgot password'
+      parameters:
+        - in: path
+          name: userId
+          description: 'user id response from verify otp response'
+          required: true
+      tags:
+       - onboarding
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                password: string
+                passwordConfirm: string
+              required:
+               - password
+               - passwordConfirm
+              example:
+                {"password":"micheal", "passwordConfirm":"micheal"}
+      responses:
+          200:
+            description: 'Success'
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/responses/DefaultSuccessResponse200'
+          400:
+            description: 'Bad request'
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    message:
+                      type: string
+                  example:
+                    { "message": "request timeout" }
+
+  /user/auth/change-password:
+    post:
+      summary: 'change currently logged in user password'
+      tags:
+       - onboarding
+      parameters:
+        - name: x-auth-token
+          in: header
+          description: 'JWT token returned from OTP verification'
+          required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                currentPassword: string
+                newPassword: string
+              required:
+               - currentPassword
+               - newPassword
+              example:
+                { "currentPassword":"michael", "newPassword":"opeyemi"}
+      responses:
+        200:
+          description: 'Success'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        400:
+          description: 'Bad request'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                example:
+                  { "message": "current password is wrong, you have three tries left" }
+          
+               
 components:
   parameters:
     UserID:
@@ -151,6 +295,18 @@ components:
             example:
               { "message": "Invalid JWT token" }
 
+    DefaultSuccessResponse200:
+      description: 'success response'
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+            example:
+              { "message": "success" }
+
   schemas:
     TicketTypeEnum:
       type: string
@@ -158,11 +314,62 @@ components:
         - show
         - concert
         - dinner
+      
+
+    DefaultSuccessResponse200:
+      description: 'success response'
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+            example:
+              { "message": "success" }
 
     SignupOTPRequestDto:
       title: SignupOTPRequestDto
       example:
         email: hashilekky@gmail.com
+      type: object
+      properties:
+        email:
+          type: string
+      required:
+        - email
+        
+    verifyForgetPasswordPRequestDto:
+      title: Verify Forgot Password otp
+      example:
+        email: hashilekky@gmail.com
+        otp: 568343
+      type: object
+      properties:
+        email:
+          type: string
+        otp:
+          type: string
+      required:
+        - email
+        - otp
+    
+    ErrorResponse404:
+      description: 'not found error'
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+            example:
+              { "message": "no resource found with the provided parameter" }
+
+    ForgotPasswordRequestDto:
+      title: ForgotPasswordRequestDto
+      example:
+        email: mykeawoniran@gmail.com
       type: object
       properties:
         email:
@@ -182,6 +389,12 @@ components:
       type: object
       properties:
         token:
+          type: string
+
+    ForgotPasswordResponse:
+      type: object
+      properties:
+        message:
           type: string
     DefaultResponse:
       title: DefaultResponse
