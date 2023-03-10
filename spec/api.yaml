@@ -86,8 +86,7 @@ paths:
       operationId: LoginUser
       summary: 'Login User'
       parameters:
-         - name: deviceId
-           in: header
+          - $ref: '#/components/parameters/DeviceID'
       requestBody:
         content:
           application/json:
@@ -100,7 +99,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/User'
-        401:
+        400:
           description: 'Bad request'
           content:
             application/json:
@@ -111,7 +110,7 @@ paths:
                     type: string
                 example:
                   { "message": "Invalid Login details" }
-        400: 
+        401: 
           description: 'Device not recognised'
           content:
               application/json:
@@ -120,10 +119,8 @@ paths:
                   properties:
                     message:
                       type: string
-                    OTP:
-                      type: integer
                   example:
-                    {"message":"Device not recognised, enter OTP to verify device","OTP":"OTP"}        
+                    {"message":"Device not recognised, enter OTP sent to mail to verify"}        
 
   /user/me:
     get:
@@ -140,27 +137,27 @@ paths:
               schema:
                 $ref: '#/components/schemas/User'
 
-  /user/edit-profile:
+  /user/profile:
        put:
          summary: 'edit user details'
          tags:
            -user
          parameters:
-           -$ref: '#/components/parameters/AuthToken'
+           - $ref: '#/components/parameters/AuthToken'
          operationId: EditUserProfile
          requestBody: 
             content:
              application/json:
                schema:
-                 $ref: '#/components/schemas/SignUpUserInfoRequest' 
+                 $ref: '#/components/schemas/EditUserInfoRequest' 
          responses:
            200:
             description: 'Success'
             content:
               application/json:
                 schema:
-                $ref: '#components/schemas/User'
-           400: 
+                  $ref: '#components/schemas/User'
+           404: 
              description: 'User does not exist'
              content:
                application/json:
@@ -187,6 +184,12 @@ components:
       schema:
         type: string
       required: true
+    DeviceID:
+       name: x-device-id
+       in: header
+       schema:
+          type: string
+       required: true
   responses:
     ErrorResponse401:
       description: 'Invalid JWT token'
@@ -281,6 +284,14 @@ components:
           type: string
         fullName:
           type: string
+
+    EditUserInfoRequest:
+        type: object
+        required:
+          - fullName
+        properties:
+           fullName:
+              type: string
 
     LoginRequest:
       type: object
