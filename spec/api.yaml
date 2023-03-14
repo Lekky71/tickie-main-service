@@ -141,7 +141,7 @@ paths:
        put:
          summary: 'edit user details'
          tags:
-           -user
+           - user
          parameters:
            - $ref: '#/components/parameters/AuthToken'
          operationId: EditUserProfile
