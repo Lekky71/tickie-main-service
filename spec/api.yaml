@@ -85,6 +85,8 @@ paths:
         - onboarding
       operationId: LoginUser
       summary: 'Login User'
+      parameters:
+          - $ref: '#/components/parameters/DeviceID'
       requestBody:
         content:
           application/json:
@@ -108,6 +110,17 @@ paths:
                     type: string
                 example:
                   { "message": "Invalid Login details" }
+        401: 
+          description: 'Device not recognised'
+          content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    message:
+                      type: string
+                  example:
+                    {"message":"Device not recognised, enter OTP sent to mail to verify"}        
 
   /user/me:
     get:
@@ -124,6 +137,39 @@ paths:
               schema:
                 $ref: '#/components/schemas/User'
 
+  /user/profile:
+       put:
+         summary: 'edit user details'
+         tags:
+           - user
+         parameters:
+           - $ref: '#/components/parameters/AuthToken'
+         operationId: EditUserProfile
+         requestBody: 
+            content:
+             application/json:
+               schema:
+                 $ref: '#/components/schemas/EditUserInfoRequest' 
+         responses:
+           200:
+            description: 'Success'
+            content:
+              application/json:
+                schema:
+                  $ref: '#components/schemas/User'
+           404: 
+             description: 'User does not exist'
+             content:
+               application/json:
+                 schema:
+                   type: object
+                   properties:
+                     message:
+                       type: string
+                   example:
+                      { "message": "User not found" }      
+    
+    
 components:
   parameters:
     UserID:
@@ -138,6 +184,12 @@ components:
       schema:
         type: string
       required: true
+    DeviceID:
+       name: x-device-id
+       in: header
+       schema:
+          type: string
+       required: true
   responses:
     ErrorResponse401:
       description: 'Invalid JWT token'
@@ -232,6 +284,14 @@ components:
           type: string
         fullName:
           type: string
+
+    EditUserInfoRequest:
+        type: object
+        required:
+          - fullName
+        properties:
+           fullName:
+              type: string
 
     LoginRequest:
       type: object
