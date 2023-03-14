@@ -3,6 +3,7 @@ import errorHandler from 'errorhandler';
 
 import app from '../../app';
 import { Logger } from '../../helpers/Logger';
+import { connectMongo } from '../../helpers/mongodb.connector';
 
 app.use(errorHandler());
 
@@ -10,9 +11,10 @@ app.use(errorHandler());
   // Initialize server
   const server = app.listen(process.env.APP_PORT || 8000, () => {
     const port = app.get('port');
-
     Logger.Info(`Auth Service Started at http://localhost:${port}`);
     Logger.Info('Press CTRL+C to stop\n');
+    Logger.Info(`Connecting to MongoDB...`);
+    connectMongo();
   });
 
   // Nodemon dev hack
