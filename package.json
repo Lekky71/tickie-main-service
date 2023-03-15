@@ -6,7 +6,7 @@
   "private": true,
   "scripts": {
     "prod:start": "NODE_ENV=production node ./dist/bin/www/index.js",
-    "dev:start": "NODE_ENV=development ts-node ./src/bin/www/index.ts",
+    "dev:start": "ts-node ./src/bin/www/index.ts",
     "dev:watch": "nodemon ./src/bin/www/index.ts",
     "build": "webpack",
     "test": "jest",
@@ -18,7 +18,8 @@
     "typeorm": "ts-node ./node_modules/.bin/typeorm -f ./src/typeorm.ts"
   },
   "engines": {
-    "node": ">=12.10.0"
+    "node": "16.13.2",
+    "npm": "8.1.2"
   },
   "repository": {
     "type": "git",
@@ -56,10 +57,13 @@
     "memory-cache": "0.2.0",
     "method-override": "3.0.0",
     "moment": "2.29.4",
+    "mongoose": "7.0.1",
+    "mongoose-bcrypt": "^1.10.1",
+    "redis": "^4.6.5",
     "request-debug": "0.2.0",
     "swagger-jsdoc": "6.2.8",
     "swagger-ui-express": "4.6.2",
-    "uuid": "3.3.3"
+    "uuid": "9.0.0"
   },
   "devDependencies": {
     "@types/body-parser": "1.17.1",
