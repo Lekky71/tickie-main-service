@@ -20,7 +20,7 @@ const userAuthTokenSchema = new mongoose.Schema<IUserAuth>(
       //   type: mongoose.Types.ObjectId,
       type: String,
       required: true,
-      ref: 'User',
+      ref: 'users',
     },
 
     // password: { type: String, required: true, bcrypt: true, round: 10 },
