@@ -9,7 +9,7 @@ paths:
     post:
       summary: "Signup: OTP Request"
       tags:
-        - onboarding
+      - onboarding
       operationId: SignupOTPRequest
       requestBody:
         content:
@@ -37,7 +37,7 @@ paths:
   /user/auth/otp-verify/signup:
     post:
       tags:
-        - onboarding
+      - onboarding
       operationId: SignUpOTPVerify
       summary: 'Endpoint to receive OTP sent to user email'
       requestBody:
@@ -56,14 +56,14 @@ paths:
   /user/auth/signup:
     post:
       tags:
-        - onboarding
+      - onboarding
       operationId: SignUpUserInfo
       summary: 'Save new user information'
       parameters:
-        - name: x-auth-token
-          in: header
-          description: 'JWT token returned from OTP verification'
-          required: true
+      - name: x-auth-token
+        in: header
+        description: 'JWT token returned from OTP verification'
+        required: true
       requestBody:
         content:
           application/json:
@@ -82,7 +82,7 @@ paths:
   /user/auth/login:
     post:
       tags:
-        - onboarding
+      - onboarding
       operationId: LoginUser
       summary: 'Login User'
       requestBody:
@@ -106,16 +106,15 @@ paths:
                 properties:
                   message:
                     type: string
-                example:
-                  { "message": "Invalid Login details" }
+                example: {"message": "Invalid Login details"}
 
   /user/me:
     get:
       summary: 'Get user details'
       tags:
-        - user
+      - user
       parameters:
-        - $ref: '#/components/parameters/AuthToken'
+      - $ref: '#/components/parameters/AuthToken'
       responses:
         200:
           description: 'Success'
@@ -128,32 +127,32 @@ paths:
     post:
       summary: 'Send Forgot password Email OTP'
       tags:
-        - onboarding
+      - onboarding
       requestBody:
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/ForgotPasswordRequestDto'
       responses:
-          200:
-            description: 'Success'
-            content:
-              application/json:
-                schema:
-                  $ref: '#/components/schemas/DefaultSuccessResponse200'
-          404:
-            description: 'Not found Request'
-            content:
-              application/json:
-                schema:
-                  $ref: '#/components/schemas/ErrorResponse404'
+        200:
+          description: 'Success'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DefaultSuccessResponse200'
+        404:
+          description: 'Not found Request'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse404'
 
 
   /user/auth/otp-verify/forgot-password:
     post:
       summary: 'verify password reset otp'
       tags:
-       - onboarding
+      - onboarding
       requestBody:
         content:
           application/json:
@@ -168,9 +167,8 @@ paths:
                 type: object
                 properties:
                   message: string
-                  userId : string
-                example :
-                  {"message":"success", "userId":"62c2391994184ejdwf"}
+                  userId: string
+                example: {"message": "success", "userId": "62c2391994184ejdwf"}
         400:
           description: 'Bad request'
           content:
@@ -180,19 +178,18 @@ paths:
                 properties:
                   message:
                     type: string
-                example:
-                  { "message": "otp expired of invalid" }
+                example: {"message": "otp expired of invalid"}
 
   /user/auth/reset-password{userId}:
     post:
       summary: 'reset forgot password'
       parameters:
-        - in: path
-          name: userId
-          description: 'user id response from verify otp response'
-          required: true
+      - in: path
+        name: userId
+        description: 'user id response from verify otp response'
+        required: true
       tags:
-       - onboarding
+      - onboarding
       requestBody:
         content:
           application/json:
@@ -202,39 +199,37 @@ paths:
                 password: string
                 passwordConfirm: string
               required:
-               - password
-               - passwordConfirm
-              example:
-                {"password":"micheal", "passwordConfirm":"micheal"}
+              - password
+              - passwordConfirm
+              example: {"password": "micheal", "passwordConfirm": "micheal"}
       responses:
-          200:
-            description: 'Success'
-            content:
-              application/json:
-                schema:
-                  $ref: '#/components/responses/DefaultSuccessResponse200'
-          400:
-            description: 'Bad request'
-            content:
-              application/json:
-                schema:
-                  type: object
-                  properties:
-                    message:
-                      type: string
-                  example:
-                    { "message": "request timeout" }
+        200:
+          description: 'Success'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/DefaultSuccessResponse200'
+        400:
+          description: 'Bad request'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                example: {"message": "request timeout"}
 
   /user/auth/change-password:
     post:
       summary: 'change currently logged in user password'
       tags:
-       - onboarding
+      - onboarding
       parameters:
-        - name: x-auth-token
-          in: header
-          description: 'JWT token returned from OTP verification'
-          required: true
+      - name: x-auth-token
+        in: header
+        description: 'JWT token returned from OTP verification'
+        required: true
       requestBody:
         content:
           application/json:
@@ -244,10 +239,9 @@ paths:
                 currentPassword: string
                 newPassword: string
               required:
-               - currentPassword
-               - newPassword
-              example:
-                { "currentPassword":"michael", "newPassword":"opeyemi"}
+              - currentPassword
+              - newPassword
+              example: {"currentPassword": "michael", "newPassword": "opeyemi"}
       responses:
         200:
           description: 'Success'
@@ -264,10 +258,9 @@ paths:
                 properties:
                   message:
                     type: string
-                example:
-                  { "message": "current password is wrong, you have three tries left" }
-          
-               
+                example: {"message": "current password is wrong, you have three tries left"}
+
+
 components:
   parameters:
     UserID:
@@ -292,8 +285,7 @@ components:
             properties:
               message:
                 type: string
-            example:
-              { "message": "Invalid JWT token" }
+            example: {"message": "Invalid JWT token"}
 
     DefaultSuccessResponse200:
       description: 'success response'
@@ -304,17 +296,16 @@ components:
             properties:
               message:
                 type: string
-            example:
-              { "message": "success" }
+            example: {"message": "success"}
 
   schemas:
     TicketTypeEnum:
       type: string
       enum:
-        - show
-        - concert
-        - dinner
-      
+      - show
+      - concert
+      - dinner
+
 
     DefaultSuccessResponse200:
       description: 'success response'
@@ -325,8 +316,7 @@ components:
             properties:
               message:
                 type: string
-            example:
-              { "message": "success" }
+            example: {"message": "success"}
 
     SignupOTPRequestDto:
       title: SignupOTPRequestDto
@@ -337,9 +327,9 @@ components:
         email:
           type: string
       required:
-        - email
-        
-    verifyForgetPasswordPRequestDto:
+      - email
+
+    verifyForgetPasswordRequestDto:
       title: Verify Forgot Password otp
       example:
         email: hashilekky@gmail.com
@@ -351,9 +341,9 @@ components:
         otp:
           type: string
       required:
-        - email
-        - otp
-    
+      - email
+      - otp
+
     ErrorResponse404:
       description: 'not found error'
       content:
@@ -363,8 +353,7 @@ components:
             properties:
               message:
                 type: string
-            example:
-              { "message": "no resource found with the provided parameter" }
+            example: {"message": "no resource found with the provided parameter"}
 
     ForgotPasswordRequestDto:
       title: ForgotPasswordRequestDto
@@ -375,7 +364,7 @@ components:
         email:
           type: string
       required:
-        - email
+      - email
 
     SignupVerifyOtpRequest:
       type: object
@@ -403,7 +392,7 @@ components:
         message:
           type: string
       required:
-        - message
+      - message
 
     ErrorResponse:
       title: DefaultResponse
@@ -414,14 +403,14 @@ components:
         message:
           type: string
       required:
-        - message
+      - message
 
     User:
       type: object
       required:
-        - id
-        - fullName
-        - email
+      - id
+      - fullName
+      - email
       properties:
         id:
           type: string
@@ -438,8 +427,8 @@ components:
     SignUpUserInfoRequest:
       type: object
       required:
-        - password
-        - fullName
+      - password
+      - fullName
       properties:
         password:
           type: string
@@ -449,8 +438,8 @@ components:
     LoginRequest:
       type: object
       required:
-        - email
-        - password
+      - email
+      - password
       properties:
         email:
           type: string
