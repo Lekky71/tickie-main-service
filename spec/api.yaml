@@ -3,7 +3,6 @@ info:
   title: Tickie API Docs
   version: 1.0.0
   description: bla bla bla
-
 paths:
   /user/auth/otp-request:
     post:
@@ -56,14 +55,14 @@ paths:
   /user/auth/signup:
     post:
       tags:
-        - onboarding
+      - onboarding
       operationId: SignUpUserInfo
       summary: 'Save new user information'
       parameters:
-        - name: x-auth-token
-          in: header
-          description: 'JWT token returned from OTP verification'
-          required: true
+      - name: x-auth-token
+        in: header
+        description: 'JWT token returned from OTP verification'
+        required: true
       requestBody:
         content:
           application/json:
@@ -82,11 +81,11 @@ paths:
   /user/auth/login:
     post:
       tags:
-        - onboarding
+      - onboarding
       operationId: LoginUser
       summary: 'Login User'
       parameters:
-          - $ref: '#/components/parameters/DeviceID'
+        - $ref: '#/components/parameters/DeviceID'
       requestBody:
         content:
           application/json:
@@ -126,9 +125,9 @@ paths:
     get:
       summary: 'Get user details'
       tags:
-        - user
+      - user
       parameters:
-        - $ref: '#/components/parameters/AuthToken'
+      - $ref: '#/components/parameters/AuthToken'
       responses:
         200:
           description: 'Success'
@@ -200,16 +199,15 @@ components:
             properties:
               message:
                 type: string
-            example:
-              { "message": "Invalid JWT token" }
+            example: {"message": "Invalid JWT token"}
 
   schemas:
     TicketTypeEnum:
       type: string
       enum:
-        - show
-        - concert
-        - dinner
+      - show
+      - concert
+      - dinner
 
     SignupOTPRequestDto:
       title: SignupOTPRequestDto
@@ -220,7 +218,7 @@ components:
         email:
           type: string
       required:
-        - email
+      - email
 
     SignupVerifyOtpRequest:
       type: object
@@ -242,7 +240,7 @@ components:
         message:
           type: string
       required:
-        - message
+      - message
 
     ErrorResponse:
       title: DefaultResponse
@@ -253,14 +251,14 @@ components:
         message:
           type: string
       required:
-        - message
+      - message
 
     User:
       type: object
       required:
-        - id
-        - fullName
-        - email
+      - id
+      - fullName
+      - email
       properties:
         id:
           type: string
@@ -277,8 +275,8 @@ components:
     SignUpUserInfoRequest:
       type: object
       required:
-        - password
-        - fullName
+      - password
+      - fullName
       properties:
         password:
           type: string
@@ -296,8 +294,8 @@ components:
     LoginRequest:
       type: object
       required:
-        - email
-        - password
+      - email
+      - password
       properties:
         email:
           type: string

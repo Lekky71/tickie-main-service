@@ -13,7 +13,7 @@ app.use(errorHandler());
     const port = app.get('port');
     Logger.Info(`Auth Service Started at http://localhost:${port}`);
     Logger.Info('Press CTRL+C to stop\n');
-    Logger.Info(`Connecting to MongoDB...`);
+    Logger.Info('Connecting to MongoDB...');
     connectMongo();
   });
 
