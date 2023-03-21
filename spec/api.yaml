@@ -10,7 +10,6 @@ paths:
       summary: "Signup: OTP Request"
       tags:
       - onboarding
-      - onboarding
       operationId: SignupOTPRequest
       requestBody:
         content:
@@ -110,7 +109,6 @@ paths:
                   message:
                     type: string
                 example: {"message": "Invalid Login details"}
-
         401:
           description: 'Device not recognised'
           content:
@@ -121,7 +119,6 @@ paths:
                   message:
                     type: string
                 example: {"message": "Device not recognised, enter OTP sent to mail to verify"}
-
 
   /user/me:
     get:
@@ -138,7 +135,6 @@ paths:
               schema:
                 $ref: '#/components/schemas/User'
 
-
   /user/profile:
     put:
       summary: 'edit user details'
@@ -147,83 +143,28 @@ paths:
       parameters:
       - $ref: '#/components/parameters/AuthToken'
       operationId: EditUserProfile
-
-  /user/auth/forgot-password:
-    post:
-      summary: 'Forgot Password OTP Request email'
-      tags:
-      - onboarding
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ForgotPasswordRequestDto'
+              $ref: '#/components/schemas/EditUserInfoRequest'
       responses:
         200:
           description: 'Success'
           content:
             application/json:
               schema:
-                $ref: '#/components/responses/DefaultSuccessResponse200'
-        400:
-          description: 'Bad Request'
+                $ref: '#components/schemas/User'
+        404:
+          description: 'User does not exist'
           content:
             application/json:
               schema:
-                $ref: '#/components/responses/ErrorResponse400'
-
-
-  /user/auth/otp-verify/forgot-password:
-    post:
-      summary: 'verify password reset otp'
-      tags:
-      - onboarding
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/VerifyForgetPasswordRequestDto'
-      responses:
-        200:
-          description: 'Success'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/responses/DefaultSuccessResponse200'
-        400:
-          description: 'Bad request'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/responses/ErrorResponse400'
-
-  /user/auth/change-password:
-    post:
-      summary: 'change currently logged in user password'
-      tags:
-      - onboarding
-      parameters:
-      - $ref: '#/components/parameters/AuthToken'
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ChangePasswordRequestDTO'
-
-      responses:
-        200:
-          description: 'Success'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/User'
-        400:
-          description: 'Bad request'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/responses/ErrorResponse400'
-
+                type: object
+                properties:
+                  message:
+                    type: string
+                example: {"message": "User not found"}
 
 
 components:
@@ -258,21 +199,6 @@ components:
                 type: string
             example: {"message": "Invalid JWT token"}
 
-
-    DefaultSuccessResponse200:
-      type: object
-      properties:
-        message:
-          type: string
-      example: {"message": "success"}
-
-    ErrorResponse400:
-      type: object
-      properties:
-        message:
-          type: string
-      example: {"message": "bad request"}
-
   schemas:
     TicketTypeEnum:
       type: string
@@ -292,50 +218,6 @@ components:
       required:
       - email
 
-    VerifyForgetPasswordRequestDto:
-      title: Verify Forgot Password otp
-      example:
-        email: "hashilekky@gmail.com"
-        otp: 568343
-        newPassword: "michael"
-      type: object
-      properties:
-        email:
-          type: string
-        otp:
-          type: string
-        newPassword:
-          type: string
-      required:
-      - email
-      - otp
-      - newPassword
-
-    ChangePasswordRequestDTO:
-      type: object
-      properties:
-        currentPassword: string
-        newPassword: string
-      required:
-      - currentPassword
-      - newPassword
-      example: {"currentPassword": "michael", "newPassword": "opeyemi"}
-
-
-
-
-    ForgotPasswordRequestDto:
-      title: ForgotPasswordRequestDto
-      example:
-        email: mykeawoniran@gmail.com
-      type: object
-      properties:
-        email:
-          type: string
-      required:
-      - email
-
-
     SignupVerifyOtpRequest:
       type: object
       properties:
@@ -349,14 +231,6 @@ components:
       properties:
         token:
           type: string
-
-
-    ForgotPasswordResponse:
-      type: object
-      properties:
-        message:
-          type: string
-
     DefaultResponse:
       title: DefaultResponse
       type: object
