@@ -55,14 +55,14 @@ paths:
   /user/auth/signup:
     post:
       tags:
-      - onboarding
+        - onboarding
       operationId: SignUpUserInfo
       summary: 'Save new user information'
       parameters:
-      - name: x-auth-token
-        in: header
-        description: 'JWT token returned from OTP verification'
-        required: true
+        - name: x-auth-token
+          in: header
+          description: 'JWT token returned from OTP verification'
+          required: true
       requestBody:
         content:
           application/json:
@@ -81,7 +81,7 @@ paths:
   /user/auth/login:
     post:
       tags:
-      - onboarding
+        - onboarding
       operationId: LoginUser
       summary: 'Login User'
       parameters:
@@ -109,25 +109,25 @@ paths:
                     type: string
                 example:
                   { "message": "Invalid Login details" }
-        401: 
+        401:
           description: 'Device not recognised'
           content:
-              application/json:
-                schema:
-                  type: object
-                  properties:
-                    message:
-                      type: string
-                  example:
-                    {"message":"Device not recognised, enter OTP sent to mail to verify"}        
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                example:
+                  { "message": "Device not recognised, enter OTP sent to mail to verify" }
 
   /user/me:
     get:
       summary: 'Get user details'
       tags:
-      - user
+        - user
       parameters:
-      - $ref: '#/components/parameters/AuthToken'
+        - $ref: '#/components/parameters/AuthToken'
       responses:
         200:
           description: 'Success'
@@ -137,38 +137,38 @@ paths:
                 $ref: '#/components/schemas/User'
 
   /user/profile:
-       put:
-         summary: 'edit user details'
-         tags:
-           - user
-         parameters:
-           - $ref: '#/components/parameters/AuthToken'
-         operationId: EditUserProfile
-         requestBody: 
-            content:
-             application/json:
-               schema:
-                 $ref: '#/components/schemas/EditUserInfoRequest' 
-         responses:
-           200:
-            description: 'Success'
-            content:
-              application/json:
-                schema:
-                  $ref: '#components/schemas/User'
-           404: 
-             description: 'User does not exist'
-             content:
-               application/json:
-                 schema:
-                   type: object
-                   properties:
-                     message:
-                       type: string
-                   example:
-                      { "message": "User not found" }      
-    
-    
+    put:
+      summary: 'edit user details'
+      tags:
+        - user
+      parameters:
+        - $ref: '#/components/parameters/AuthToken'
+      operationId: EditUserProfile
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EditUserInfoRequest'
+      responses:
+        200:
+          description: 'Success'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        404:
+          description: 'User does not exist'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                example:
+                  { "message": "User not found" }
+
+
 components:
   parameters:
     UserID:
@@ -184,11 +184,11 @@ components:
         type: string
       required: true
     DeviceID:
-       name: x-device-id
-       in: header
-       schema:
-          type: string
-       required: true
+      name: x-device-id
+      in: header
+      schema:
+        type: string
+      required: true
   responses:
     ErrorResponse401:
       description: 'Invalid JWT token'
@@ -199,15 +199,15 @@ components:
             properties:
               message:
                 type: string
-            example: {"message": "Invalid JWT token"}
+            example: { "message": "Invalid JWT token" }
 
   schemas:
     TicketTypeEnum:
       type: string
       enum:
-      - show
-      - concert
-      - dinner
+        - show
+        - concert
+        - dinner
 
     SignupOTPRequestDto:
       title: SignupOTPRequestDto
@@ -218,7 +218,7 @@ components:
         email:
           type: string
       required:
-      - email
+        - email
 
     SignupVerifyOtpRequest:
       type: object
@@ -240,7 +240,7 @@ components:
         message:
           type: string
       required:
-      - message
+        - message
 
     ErrorResponse:
       title: DefaultResponse
@@ -251,14 +251,13 @@ components:
         message:
           type: string
       required:
-      - message
-
+        - message
     User:
       type: object
       required:
-      - id
-      - fullName
-      - email
+        - id
+        - fullName
+        - email
       properties:
         id:
           type: string
@@ -275,8 +274,8 @@ components:
     SignUpUserInfoRequest:
       type: object
       required:
-      - password
-      - fullName
+        - password
+        - fullName
       properties:
         password:
           type: string
@@ -284,18 +283,18 @@ components:
           type: string
 
     EditUserInfoRequest:
-        type: object
-        required:
-          - fullName
-        properties:
-           fullName:
-              type: string
+      type: object
+      required:
+        - fullName
+      properties:
+        fullName:
+          type: string
 
     LoginRequest:
       type: object
       required:
-      - email
-      - password
+        - email
+        - password
       properties:
         email:
           type: string
