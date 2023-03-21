@@ -86,7 +86,7 @@ paths:
       operationId: LoginUser
       summary: 'Login User'
       parameters:
-      - $ref: '#/components/parameters/DeviceID'
+        - $ref: '#/components/parameters/DeviceID'
       requestBody:
         content:
           application/json:
@@ -108,17 +108,19 @@ paths:
                 properties:
                   message:
                     type: string
-                example: {"message": "Invalid Login details"}
-        401:
+                example:
+                  { "message": "Invalid Login details" }
+        401: 
           description: 'Device not recognised'
           content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                example: {"message": "Device not recognised, enter OTP sent to mail to verify"}
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    message:
+                      type: string
+                  example:
+                    {"message":"Device not recognised, enter OTP sent to mail to verify"}        
 
   /user/me:
     get:
@@ -136,37 +138,38 @@ paths:
                 $ref: '#/components/schemas/User'
 
   /user/profile:
-    put:
-      summary: 'edit user details'
-      tags:
-      - user
-      parameters:
-      - $ref: '#/components/parameters/AuthToken'
-      operationId: EditUserProfile
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/EditUserInfoRequest'
-      responses:
-        200:
-          description: 'Success'
-          content:
-            application/json:
-              schema:
-                $ref: '#components/schemas/User'
-        404:
-          description: 'User does not exist'
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                example: {"message": "User not found"}
-
-
+       put:
+         summary: 'edit user details'
+         tags:
+           - user
+         parameters:
+           - $ref: '#/components/parameters/AuthToken'
+         operationId: EditUserProfile
+         requestBody: 
+            content:
+             application/json:
+               schema:
+                 $ref: '#/components/schemas/EditUserInfoRequest' 
+         responses:
+           200:
+            description: 'Success'
+            content:
+              application/json:
+                schema:
+                  $ref: '#components/schemas/User'
+           404: 
+             description: 'User does not exist'
+             content:
+               application/json:
+                 schema:
+                   type: object
+                   properties:
+                     message:
+                       type: string
+                   example:
+                      { "message": "User not found" }      
+    
+    
 components:
   parameters:
     UserID:
@@ -182,11 +185,19 @@ components:
         type: string
       required: true
     DeviceID:
+<<<<<<< HEAD
       name: x-device-id
       in: header
       schema:
         type: string
       required: true
+=======
+       name: x-device-id
+       in: header
+       schema:
+          type: string
+       required: true
+>>>>>>> 25ff44f7759508998554652761ea66515c732347
   responses:
     ErrorResponse401:
       description: 'Invalid JWT token'
@@ -282,12 +293,21 @@ components:
           type: string
 
     EditUserInfoRequest:
+<<<<<<< HEAD
       type: object
       required:
       - fullName
       properties:
         fullName:
           type: string
+=======
+        type: object
+        required:
+          - fullName
+        properties:
+           fullName:
+              type: string
+>>>>>>> 25ff44f7759508998554652761ea66515c732347
 
     LoginRequest:
       type: object
