@@ -40,14 +40,14 @@ const UserVerificationSchema = new Schema(
   },
   {
     toObject: {
-      transform(doc, ret /**_options */) {
+      transform(doc, ret, /**_options*/) {
         ret.id = ret._id;
         delete ret._id;
         return ret;
       },
     },
     toJSON: {
-      transform(doc, ret /**_options */) {
+      transform(doc, ret, /**_options*/) {
         ret.id = ret._id;
         delete ret._id;
         return ret;

@@ -4,7 +4,6 @@ export const config = {
     collections: {
       userVerifications: 'user_verifications',
       users: 'users',
-      userAuth: 'user_auth_token',
     },
   },
 };
