@@ -3,7 +3,6 @@ info:
   title: Tickie API Docs
   version: 1.0.0
   description: bla bla bla
-
 paths:
   /user/auth/otp-request:
     post:
@@ -185,19 +184,11 @@ components:
         type: string
       required: true
     DeviceID:
-<<<<<<< HEAD
-      name: x-device-id
-      in: header
-      schema:
-        type: string
-      required: true
-=======
        name: x-device-id
        in: header
        schema:
           type: string
        required: true
->>>>>>> 25ff44f7759508998554652761ea66515c732347
   responses:
     ErrorResponse401:
       description: 'Invalid JWT token'
@@ -293,21 +284,12 @@ components:
           type: string
 
     EditUserInfoRequest:
-<<<<<<< HEAD
-      type: object
-      required:
-      - fullName
-      properties:
-        fullName:
-          type: string
-=======
         type: object
         required:
           - fullName
         properties:
            fullName:
               type: string
->>>>>>> 25ff44f7759508998554652761ea66515c732347
 
     LoginRequest:
       type: object
