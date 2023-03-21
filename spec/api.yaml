@@ -9,7 +9,7 @@ paths:
     post:
       summary: "Signup: OTP Request"
       tags:
-      - onboarding
+        - onboarding
       operationId: SignupOTPRequest
       requestBody:
         content:
@@ -37,7 +37,7 @@ paths:
   /user/auth/otp-verify/signup:
     post:
       tags:
-      - onboarding
+        - onboarding
       operationId: SignUpOTPVerify
       summary: 'Endpoint to receive OTP sent to user email'
       requestBody:
