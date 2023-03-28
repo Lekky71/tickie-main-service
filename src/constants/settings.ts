@@ -4,7 +4,8 @@ export const config = {
     collections: {
       userVerifications: 'user_verifications',
       users: 'users',
-      userAuth:'user_auth'
+      userAuthTokens:'user_auth_tokens',
+      userAuth:'user_auths'
     },
   },
 };

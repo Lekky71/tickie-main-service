@@ -10,6 +10,8 @@ paths:
       tags:
         - onboarding
       operationId: SignupOTPRequest
+      parameters:
+        - $ref: '#/components/parameters/DeviceID'
       requestBody:
         content:
           application/json:

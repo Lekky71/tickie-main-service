@@ -1,4 +1,6 @@
 /* istanbul ignore file */
+import * as randomstring from 'randomstring';
+
 /**
  * Clean sensitive data from a string
  *
@@ -39,3 +41,10 @@ export const cleanObj = (obj: any, filters: string[]): any => {
 
   return _obj;
 };
+
+export function generateOtp(): string {
+  return randomstring.generate({
+    length: 6,
+    charset: 'alphanumeric'
+  });
+}

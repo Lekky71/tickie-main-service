@@ -1,9 +1,8 @@
 import mongoose from 'mongoose';
-import uuid from 'uuid';
-import { IUserAuth } from '../interfaces';
 import { config } from '../constants/settings';
+import uuid from 'uuid';
 
-const userAuthTokenSchema = new mongoose.Schema<IUserAuth>(
+const UserAuthSchema = new mongoose.Schema(
   {
     _id: {
       type: String,
@@ -11,41 +10,45 @@ const userAuthTokenSchema = new mongoose.Schema<IUserAuth>(
         return uuid.v4();
       },
     },
-
-    token: { type: String, required: true },
-
-    email: { type: String, required: true, lowercase: true, trim: true },
-
+    email: {
+      type: String,
+      required: true,
+      lowercase: true,
+      true: true,
+    },
+    password: {
+      type: String,
+      required: true,
+    },
+    recognisedDevices: [
+      {
+        type: String,
+        required: true,
+      },
+    ],
     userId: {
-      //   type: mongoose.Types.ObjectId,
       type: String,
       required: true,
       ref: 'users',
     },
-
-    // password: { type: String, required: true, bcrypt: true, round: 10 },
   },
-
   {
     toObject: {
-      transform(doc, ret /**_options */) {
+      transform(doc, ret, _options) {
         ret.id = ret._id;
         delete ret._id;
         return ret;
       },
     },
     toJSON: {
-      transform(doc, ret /**_options */) {
+      transform(doc, ret, _options) {
         ret.id = ret._id;
         delete ret._id;
-        return ret;
+        return ret
       },
     },
-    timestamps: true,
-    versionKey: false,
-  },
+    timestamps: true, versionKey: false
+  }
 );
 
-// userAuthSchema.plugin(require('mongoose-bcrypt'))
-
-export const userAuth = mongoose.model<IUserAuth>(config.mongodb.collections.userAuth, userAuthTokenSchema);
+export const UserAuthDb = mongoose.model(config.mongodb.collections.userAuth, UserAuthSchema);

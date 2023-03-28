@@ -1,5 +1,5 @@
 import express from 'express';
-import {routeError} from '../handlers';
+import { routeError } from '../handlers';
 
 import triangleRoutes from './triangle';
 import { MainApiValidator } from '../middlewares/openapi.validator';
