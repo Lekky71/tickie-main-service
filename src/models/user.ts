@@ -1,12 +1,12 @@
 import * as mongoose from 'mongoose';
 import { Schema } from 'mongoose';
 import { config } from '../constants/settings';
-import uuid from 'uuid';
+import { v4 as uuidv4 } from 'uuid';
 
 const UserSchema = new Schema({
   _id: {
     type: String, default: function genUUID() {
-      return uuid.v4();
+      return uuidv4();
     },
   },
   email: {

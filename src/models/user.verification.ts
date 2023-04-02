@@ -3,12 +3,12 @@ import * as crypto from 'crypto';
 import * as mongoose from 'mongoose';
 import { config } from '../constants/settings';
 import { OtpType } from '../interfaces/user.verification';
-import uuid from 'uuid';
+import { v4 as uuidv4 } from 'uuid';
 
 const UserVerificationSchema = new Schema({
   _id: {
     type: String, default: function genUUID() {
-      return uuid.v4();
+      return uuidv4();
     },
   },
   email: {
@@ -30,7 +30,7 @@ const UserVerificationSchema = new Schema({
     enum: Object.keys(OtpType),
     required: true,
   },
-  expireAt: {
+  expiresAt: {
     type: Date,
     default: Date.now,
     index: { expires: '10m' },
