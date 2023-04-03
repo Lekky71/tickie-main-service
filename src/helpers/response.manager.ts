@@ -1,33 +1,35 @@
 import { Response } from 'express';
-
-/**
- * Created by Oluwaleke Fakorede on 15/12/2018.
- */
+import { HttpStatus } from '../constants/httpStatus';
+import { CustomError } from './CustomError';
 
 function respond(res: Response, data: any, httpCode: number): void {
-  const response = {
-    error: data.error,
-    code: httpCode,
-    data: data.response,
-    message: data.message,
-  };
   res.setHeader('Content-Type', 'application/json');
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Credentials', 'true');
-  res.setHeader('Access-Control-Allow-Method', '*');
 
   res.writeHead(httpCode);
-  res.end(JSON.stringify(response));
+  res.end(JSON.stringify(data));
 }
 
-export function success(res: Response, response: any, status: number = 200): void {
-  const data = response;
-  data.error = false;
-  respond(res, data, status);
+export function success(res: Response, response: any, status = 200): void {
+  respond(res, response, status);
 }
 
-export function failure(res: Response, response: any, httpCode: number = 503): void {
+export function failure(res: Response, response: any, httpCode = 503): void {
   const data = response;
   data.error = true;
   respond(res, data, httpCode);
+}
+
+export function handleError(res: Response, err: any) {
+  console.error(err);
+  let code = HttpStatus.INTERNAL_SERVER_ERROR;
+  let message = err.message || 'Internal Server Error Occurred';
+
+  if (err instanceof CustomError) {
+    code = err.code;
+    message = err.message;
+  }
+
+  return failure(res, {
+    message,
+  }, code);
 }

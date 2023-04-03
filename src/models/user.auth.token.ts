@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import uuid from 'uuid';
+import { v4 as uuidv4 } from 'uuid';
 import { IUserAuth } from '../interfaces';
 import { config } from '../constants/settings';
 
@@ -8,7 +8,7 @@ const userAuthTokenSchema = new mongoose.Schema<IUserAuth>(
     _id: {
       type: String,
       default: function genUUID() {
-        return uuid.v4();
+        return uuidv4();
       },
     },
 

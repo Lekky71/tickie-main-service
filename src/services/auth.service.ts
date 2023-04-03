@@ -1,11 +1,12 @@
-import { SignupOtpRequest } from '../interfaces/auth.requests';
+import { SignupOtpRequest, SignupOtpVerifyRequest } from '../interfaces/auth.requests';
 import { UserAuthDb } from '../models/user.auth';
 import { BadRequestError } from '../interfaces';
 import { generateOtp } from '../helpers/Utils';
 import { UserVerificationDb } from '../models/user.verification';
-import { OtpType } from '../interfaces/user.verification';
+import { JwtType, OtpType } from '../interfaces/user.verification';
+import { generateToken } from '../helpers/jwt.helper';
 
-export async function sendSignUoOtp(body: SignupOtpRequest): Promise<boolean> {
+export async function sendSignUoOtp(body: SignupOtpRequest): Promise<void> {
   const { deviceId } = body;
   let { email } = body;
   email = email.toLowerCase();
@@ -16,6 +17,18 @@ export async function sendSignUoOtp(body: SignupOtpRequest): Promise<boolean> {
   if (existingAuth) {
     throw new BadRequestError('Email is already in use');
   }
+
+  // We do not want users to request OTP within a minute of already requesting for one.
+  const existingVerification = await UserVerificationDb.findOne({
+    email,
+    deviceId,
+    createdAt: { $gte: Date.now() - (60000) }
+  });
+
+  if (existingVerification) {
+    throw new BadRequestError('OTP has been sent within the minute.');
+  }
+
   // Generate random otp
   const otp = generateOtp();
   const newVer = new UserVerificationDb({
@@ -27,6 +40,35 @@ export async function sendSignUoOtp(body: SignupOtpRequest): Promise<boolean> {
   });
   // Save the record
   await newVer.save();
-  // Send via email.
-  return true;
+  // TODO: Send via email.
+}
+
+export async function verifySignupOtp(body: SignupOtpVerifyRequest): Promise<string> {
+  const { deviceId, otp } = body;
+  let { email } = body;
+  email = email.toLowerCase();
+  const verification = await UserVerificationDb.findOne({
+    email,
+    deviceId,
+    otp,
+  });
+  if (!verification) {
+    throw new BadRequestError('Invalid OTP');
+  } else if (verification.expiresAt < new Date()) {
+    throw new BadRequestError('OTP has expired');
+  }
+  // Generate the JWT.
+  const token = generateToken({
+    email,
+    deviceId,
+    type: JwtType.NEW_USER
+  });
+
+  // delete used record
+  await UserVerificationDb.deleteOne({
+    email,
+    deviceId,
+    otp,
+  });
+  return token;
 }

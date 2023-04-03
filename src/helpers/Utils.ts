@@ -45,6 +45,6 @@ export const cleanObj = (obj: any, filters: string[]): any => {
 export function generateOtp(): string {
   return randomstring.generate({
     length: 6,
-    charset: 'alphanumeric'
+    charset: 'numeric'
   });
 }

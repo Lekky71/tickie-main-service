@@ -1,4 +1,5 @@
 export const config = {
+  jwtPrivateKey: <string> process.env.JWT_PRIVATE_KEY,
   mongodb: {
     uri: <string> process.env.MONGODB_URI,
     collections: {
