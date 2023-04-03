@@ -1,14 +1,14 @@
 import mongoose from 'mongoose';
-import uuid from 'uuid';
-import { IUserAuth } from '../interfaces';
+import { v4 as uuidv4 } from 'uuid';
+import { IUserAuthToken } from '../interfaces';
 import { config } from '../constants/settings';
 
-const userAuthTokenSchema = new mongoose.Schema<IUserAuth>(
+const userAuthTokenSchema = new mongoose.Schema<IUserAuthToken>(
   {
     _id: {
       type: String,
       default: function genUUID() {
-        return uuid.v4();
+        return uuidv4();
       },
     },
 
@@ -48,4 +48,4 @@ const userAuthTokenSchema = new mongoose.Schema<IUserAuth>(
 
 // userAuthSchema.plugin(require('mongoose-bcrypt'))
 
-export const UserTokenDb = mongoose.model<IUserAuth>(config.mongodb.collections.userAuth, userAuthTokenSchema);
+export const UserTokenDb = mongoose.model<IUserAuthToken>(config.mongodb.collections.userAuthTokens, userAuthTokenSchema);

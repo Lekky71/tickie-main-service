@@ -6,7 +6,7 @@ export interface UserVerification extends Document {
   otp: string;
   deviceId: string;
   type: OtpType;
-  expireAt: string;
+  expiresAt: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -15,4 +15,10 @@ export enum OtpType {
   SIGN_UP = 'SIGN_UP',
   LOGIN = 'LOGIN',
   FORGOT_PASSWORD = 'FORGOT_PASSWORD',
+}
+
+export enum JwtType {
+  NEW_USER = 'NEW_USER',
+  USER = 'USER',
+  TRANSACTING_USER = 'TRANSACTING_USER',
 }

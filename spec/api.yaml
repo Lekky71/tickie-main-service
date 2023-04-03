@@ -41,6 +41,8 @@ paths:
         - onboarding
       operationId: SignUpOTPVerify
       summary: 'Endpoint to receive OTP sent to user email'
+      parameters:
+        - $ref: '#/components/parameters/DeviceID'
       requestBody:
         content:
           application/json:
@@ -61,10 +63,7 @@ paths:
       operationId: SignUpUserInfo
       summary: 'Save new user information'
       parameters:
-        - name: x-auth-token
-          in: header
-          description: 'JWT token returned from OTP verification'
-          required: true
+        - $ref: '#/components/parameters/AuthToken'
       requestBody:
         content:
           application/json:
@@ -219,6 +218,7 @@ components:
       properties:
         email:
           type: string
+          format: email
       required:
         - email
 
@@ -235,6 +235,7 @@ components:
       properties:
         token:
           type: string
+
     DefaultResponse:
       title: DefaultResponse
       type: object
@@ -269,7 +270,7 @@ components:
           type: string
           format: email
       example:
-        id: sdgweqgwerg
+#        id: sdgweqgwerg
         fullName: Myke Dunsimi
         email: user@example.com
 
@@ -281,6 +282,8 @@ components:
       properties:
         password:
           type: string
+          format: password
+#          pattern: "^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$"
         fullName:
           type: string
 
@@ -300,5 +303,6 @@ components:
       properties:
         email:
           type: string
+          format: email
         password:
           type: string

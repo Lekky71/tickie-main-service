@@ -1,3 +1,5 @@
+import { CustomError } from '../helpers';
+
 type errorData = string | object;
 
 export interface IErrorObject extends Error {
@@ -5,11 +7,9 @@ export interface IErrorObject extends Error {
   data?: errorData;
 }
 
-export class BadRequestError extends Error {
-  code = 400;
+export class BadRequestError extends CustomError {
   constructor(msg: string) {
-    super(msg);
+    super(400, msg);
     this.name = 'BadRequestError';
-
   }
 }
