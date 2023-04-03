@@ -1,6 +1,6 @@
-import {JwtType} from '../interfaces/user.verification';
+import { JwtType } from '../interfaces/user.verification';
 import * as jwt from 'jsonwebtoken';
-import {config} from '../constants/settings';
+import { config } from '../constants/settings';
 
 interface GenerateTokenParam {
   email: string,
