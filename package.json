@@ -43,6 +43,7 @@
     "@types/jsonwebtoken": "9.0.1",
     "@types/randomstring": "1.1.8",
     "axios": "0.21.4",
+    "bcrypt": "^5.1.0",
     "bignumber.js": "9.0.0",
     "bluebird": "3.7.2",
     "body-parser": "1.20.1",
