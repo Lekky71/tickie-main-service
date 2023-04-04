@@ -75,6 +75,7 @@ export async function verifySignupOtp(body: SignupOtpVerifyRequest): Promise<str
 }
 
 export async function handleLogin(body:{email:string, password:string, deviceId:string}):Promise<string>{
+
   const {password, deviceId}=body;
   /**pull it off separately, so I can change it to lowercase */
   const email=body.email.toLowerCase()
@@ -82,7 +83,9 @@ export async function handleLogin(body:{email:string, password:string, deviceId:
   const existingUserAuth=await UserAuthDb.findOne({email})
 
   if(!existingUserAuth||!(await existingUserAuth.verifyPassword(password))){
+
     throw  new BadRequestError('Invalid login details');
+
   }else if (!existingUserAuth.recognisedDevices.includes(deviceId)){
     /** generate, save and send a new verification otp for the user*/
     const otp= generateOtp()
@@ -92,6 +95,7 @@ export async function handleLogin(body:{email:string, password:string, deviceId:
           email, otp, deviceId, type:OtpType.LOGIN,
           expiresAt: new Date(Date.now() + (10 * 60 * 1000)),
           userId:existingUserAuth.userId
+
       },{upsert:true})
 
     // send email function goes here
@@ -103,9 +107,10 @@ export async function handleLogin(body:{email:string, password:string, deviceId:
 
   /**generate and save access_token for user*/
   const accessToken= generateToken(
-    { email,
+    {
+      email,
       deviceId,
-      type: JwtType.NEW_USER,
+      type: JwtType.USER,
       userId:existingUserAuth.userId
     })
 
@@ -119,9 +124,9 @@ export async function handleLogin(body:{email:string, password:string, deviceId:
   return accessToken
 }
 
-export async function handleVerifyLoginDeviceOtp(body:{otp:string, email:string, deviceId:string, trustDevice:boolean}):Promise<boolean>{
+export async function handleVerifyLoginDeviceOtp(body:{otp:string, email:string, deviceId:string, trustDevice:boolean}):Promise<string>{
   const {otp, email, deviceId, trustDevice}=body;
-  
+
   /** find userVerification with the provided email
    *  check if user wants to add device as a trusted device
    *  if yes? add to recognised device
@@ -130,10 +135,27 @@ export async function handleVerifyLoginDeviceOtp(body:{otp:string, email:string,
   const existingUserVer= await  UserVerificationDb.findOne({email, otp, type: OtpType.LOGIN});
   if(!existingUserVer)throw new  BadRequestError('Token expired or invalid');
 
+  const existingUserAuth = await UserAuthDb.findOne({email})
+
   if(trustDevice){
-    const existingUserAuth = await UserAuthDb.findOne({email})
     existingUserAuth?.recognisedDevices.push(deviceId)
   }
 
-  return true
+  /**send a login token to the user*/
+  const accessToken= generateToken(
+    {
+      email,
+      deviceId,
+      type: JwtType.USER,
+      userId:existingUserAuth?.userId
+    })
+
+  /**for first time login -> upsert-true*/
+  await  UserTokenDb.updateOne({email,userId:existingUserAuth?.userId},{
+    email,
+    token:accessToken,
+    userId:existingUserAuth?.userId
+  },{upsert:true})
+
+  return accessToken
 }

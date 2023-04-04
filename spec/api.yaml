@@ -75,7 +75,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DefaultResponse'
+                $ref: '#/components/schemas/TokenResponse'
         400:
           description: "Device verification failed"
           content:
@@ -340,7 +340,6 @@ components:
       properties:
         fullName:
           type: string
-
     LoginRequest:
       type: object
       required:
