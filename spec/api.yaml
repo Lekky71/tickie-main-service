@@ -267,6 +267,7 @@ components:
       properties:
         email:
           type: string
+          format: email
         otp:
           type: string
         trustDevice:
