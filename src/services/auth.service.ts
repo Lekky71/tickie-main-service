@@ -74,7 +74,6 @@ export async function verifySignupOtp(body: SignupOtpVerifyRequest): Promise<str
   return token;
 }
 
-// @ts-ignore
 export async function handleLogin(body:{email:string, password:string, deviceId:string}):Promise<string>{
   const {password, deviceId}=body;
   /**pull it off separately, so I can change it to lowercase */
@@ -89,7 +88,7 @@ export async function handleLogin(body:{email:string, password:string, deviceId:
     const otp= generateOtp()
 
     /**upsert-true...  */
-    const newVer = await UserVerificationDb.updateOne({email}, {
+    await UserVerificationDb.updateOne({email}, {
           email, otp, deviceId, type:OtpType.LOGIN,
           expiresAt: new Date(Date.now() + (10 * 60 * 1000)),
           userId:existingUserAuth.userId
@@ -110,7 +109,7 @@ export async function handleLogin(body:{email:string, password:string, deviceId:
       userId:existingUserAuth.userId
     })
 
-  /**for users that first signing in to the application*/
+  /**for first time login -> upsert-true*/
   await  UserTokenDb.updateOne({email,userId:existingUserAuth.userId},{
     email,
     token:accessToken,
