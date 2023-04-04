@@ -39,7 +39,7 @@ export async function handleVerifySignupOtp(req: IExpressRequest, res: ExpressRe
   }
 }
 
-export async function signUpWithToken(req: IExpressRequest, res: ExpressResponse): Promise<void> {
+export async function handleSignUpWithToken(req: IExpressRequest, res: ExpressResponse): Promise<void> {
   const { fullName, password, avatar } = req.body;
   const authHeader = req.headers['authorization'];
 
