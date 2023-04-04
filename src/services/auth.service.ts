@@ -79,7 +79,7 @@ export async function handleLogin(body:{email:string, password:string, deviceId:
   /**pull it off separately, so I can change it to lowercase */
   const email=body.email.toLowerCase()
 
-  const existingUserAuth=await UserAuthDb.findOne({email:email})
+  const existingUserAuth=await UserAuthDb.findOne({email})
 
   if(!existingUserAuth||!(await existingUserAuth.verifyPassword(password))){
     throw  new BadRequestError('Invalid login details');
@@ -117,4 +117,23 @@ export async function handleLogin(body:{email:string, password:string, deviceId:
   },{upsert:true})
 
   return accessToken
+}
+
+export async function handleVerifyLoginDeviceOtp(body:{otp:string, email:string, deviceId:string, trustDevice:boolean}):Promise<boolean>{
+  const {otp, email, deviceId, trustDevice}=body;
+  
+  /** find userVerification with the provided email
+   *  check if user wants to add device as a trusted device
+   *  if yes? add to recognised device
+   *  return true
+   */
+  const existingUserVer= await  UserVerificationDb.findOne({email, otp, type: OtpType.LOGIN});
+  if(!existingUserVer)throw new  BadRequestError('Token expired or invalid');
+
+  if(trustDevice){
+    const existingUserAuth = await UserAuthDb.findOne({email})
+    existingUserAuth?.recognisedDevices.push(deviceId)
+  }
+
+  return true
 }

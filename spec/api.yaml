@@ -56,6 +56,38 @@ paths:
               schema:
                 $ref: '#/components/schemas/TokenResponse'
 
+  /user/auth/otp-verify/login:
+    post:
+      tags:
+        - onboarding
+      operationId: loginVerifyOTP
+      summary: 'Endpoint to verify login OTP on device change'
+      parameters:
+        - $ref: '#/components/parameters/DeviceID'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginVerifyDeviceChangeOtpRequest'
+      responses:
+        200:
+          description: 'Device verification successful, proceed to login'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DefaultResponse'
+        400:
+          description: "Device verification failed"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                example:
+                  { "message": "device verification token expired or invalid"}
+
   /user/auth/signup:
     post:
       tags:
@@ -200,7 +232,7 @@ components:
             properties:
               message:
                 type: string
-            example: { "message": "Invalid JWT token" }
+#            example: { "message": "Invalid JWT token" }
 
   schemas:
     TicketTypeEnum:
@@ -229,6 +261,20 @@ components:
           type: string
         otp:
           type: string
+
+    LoginVerifyDeviceChangeOtpRequest:
+      type: object
+      properties:
+        email:
+          type: string
+        otp:
+          type: string
+        trustDevice:
+          type: string
+      required:
+        - email
+        - otp
+
 
     TokenResponse:
       type: object
@@ -283,7 +329,7 @@ components:
         password:
           type: string
           format: password
-          pattern: "^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$"
+#          pattern: "^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$"
         fullName:
           type: string
 

@@ -1,7 +1,7 @@
 import {IExpressRequest} from '../interfaces';
 import { Response as ExpressResponse } from 'express';
 import * as authService from '../services/auth.service';
-import * as ResponseManager from '../helpers/response.manager';
+import * as ResponseManager from '../helpers/response.manager'
 
 export async function handleSignUpOtpRequest(req: IExpressRequest, res: ExpressResponse): Promise<void> {
   const { email } = req.body;
@@ -46,6 +46,17 @@ export async function  handleLoginToAccount(req:IExpressRequest, res:ExpressResp
     const response = await authService.handleLogin({ email, password, deviceId: <string>deviceId })
     ResponseManager.success(res, { response })
   } catch (err: any) {
+    ResponseManager.handleError(res, err)
+  }
+}
+
+export async  function handleLoginToAccountOtp(req:IExpressRequest, res:ExpressResponse):Promise<void>{
+  const deviceId =req.headers['x-device-id'];
+  const {email, otp,trustDevice}=req.body;
+  try {
+    const response= await  authService.handleVerifyLoginDeviceOtp({otp, email, deviceId:<string>deviceId, trustDevice})
+    ResponseManager.success(res, { response })
+  }catch (err:any){
     ResponseManager.handleError(res, err)
   }
 }
