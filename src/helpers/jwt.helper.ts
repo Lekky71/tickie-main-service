@@ -33,6 +33,6 @@ export function generateToken(body: GenerateTokenParam): string {
 }
 
 export function verifyToken(token: string): JwtPayload   {
-  const decodedToken = jwt.verify(token, process.env.JWT_PRIVATE_KEY) as JwtPayload;
+  const decodedToken = jwt.verify(token, config.jwtPrivateKey) as JwtPayload;
   return decodedToken;
 }
