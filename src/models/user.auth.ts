@@ -1,8 +1,25 @@
-import mongoose from 'mongoose';
+import mongoose, { Model } from 'mongoose';
 import { config } from '../constants/settings';
 import { v4 as uuidv4 } from 'uuid';
 
-const UserAuthSchema = new mongoose.Schema(
+
+interface IUserAuthDocument {
+  _id: string,
+  email: string,
+  password: string,
+  recognisedDevices: string[],
+  user: string,
+}
+
+interface IUserAuth extends IUserAuthDocument {
+  verifyPassword(arg: string): boolean;
+}
+
+interface IUserAuthModel extends Model<IUserAuth> {
+
+}
+
+const UserAuthSchema = new mongoose.Schema<IUserAuthDocument, IUserAuthModel>(
   {
     _id: {
       type: String,
@@ -19,6 +36,8 @@ const UserAuthSchema = new mongoose.Schema(
     password: {
       type: String,
       required: true,
+      bcrypt: true,
+      rounds: 10
     },
     recognisedDevices: [
       {
@@ -26,7 +45,7 @@ const UserAuthSchema = new mongoose.Schema(
         required: true,
       },
     ],
-    userId: {
+    user: {
       type: String,
       required: true,
       ref: 'users',
@@ -51,4 +70,8 @@ const UserAuthSchema = new mongoose.Schema(
   }
 );
 
-export const UserAuthDb = mongoose.model(config.mongodb.collections.userAuth, UserAuthSchema);
+//no type definition file for this plugin currently
+// hence creating the interfaces above
+UserAuthSchema.plugin(require('mongoose-bcrypt'))
+
+export const UserAuthDb = mongoose.model<IUserAuthDocument, IUserAuthModel>(config.mongodb.collections.userAuth, UserAuthSchema);

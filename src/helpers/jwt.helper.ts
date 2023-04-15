@@ -1,6 +1,6 @@
-import { JwtType } from '../interfaces/user.verification';
-import * as jwt from 'jsonwebtoken';
-import { config } from '../constants/settings';
+import { JwtType } from "../interfaces/user.verification";
+import * as jwt from "jsonwebtoken";
+import { config } from "../constants/settings";
 
 interface GenerateTokenParam {
   email: string,
@@ -15,8 +15,17 @@ export function generateToken(body: GenerateTokenParam): string {
     return jwt.sign({
       email: body.email,
       deviceId: body.deviceId,
-      type: JwtType.NEW_USER,
+      type: JwtType.NEW_USER
     }, config.jwtPrivateKey, { expiresIn: 60 * 60 });
   }
-  throw new Error('type not supported yet');
+
+  if (body.type === JwtType.USER) {
+    return jwt.sign({
+      email: body.email,
+      userId: body.userId,
+      deviceId: body.email,
+      type: JwtType.USER
+    }, config.jwtPrivateKey, { expiresIn: "1W" });
+  }
+  throw new Error("type not supported yet");
 }
