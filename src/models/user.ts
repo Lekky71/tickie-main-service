@@ -38,4 +38,5 @@ const UserSchema = new Schema({
   timestamps: true, versionKey: false,
 });
 
-export const UserVerificationDb = mongoose.model(config.mongodb.collections.users, UserSchema);
+/**same name with user verification, so I change it*/
+export const UserDb = mongoose.model(config.mongodb.collections.users, UserSchema);

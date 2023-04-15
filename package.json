@@ -62,6 +62,7 @@
     "method-override": "3.0.0",
     "moment": "2.29.4",
     "mongoose": "7.0.1",
+    "mongoose-bcrypt": "^1.10.1",
     "randomstring": "1.2.3",
     "request-debug": "0.2.0",
     "swagger-jsdoc": "6.2.8",

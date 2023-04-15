@@ -1,6 +1,6 @@
 import { Document } from 'mongoose';
 
-export interface IUserAuth extends Document {
+export interface IUserAuthToken extends Document {
   _id: string;
   email: string;
   token: string;

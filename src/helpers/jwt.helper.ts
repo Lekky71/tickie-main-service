@@ -18,5 +18,14 @@ export function generateToken(body: GenerateTokenParam): string {
       type: JwtType.NEW_USER,
     }, config.jwtPrivateKey, { expiresIn: 60 * 60 });
   }
+
+  if(body.type===JwtType.USER){
+    return jwt.sign({
+      email:body.email,
+      userId:body.userId,
+      deviceId:body.email,
+      type:JwtType.USER,
+    },config.jwtPrivateKey, {expiresIn:'1W'});
+  }
   throw new Error('type not supported yet');
 }
