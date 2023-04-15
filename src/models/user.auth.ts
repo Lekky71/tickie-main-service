@@ -1,16 +1,14 @@
-import mongoose, {Model} from 'mongoose';
+import mongoose, { Model } from 'mongoose';
 import { config } from '../constants/settings';
 import { v4 as uuidv4 } from 'uuid';
 
 
-
-
 interface IUserAuthDocument {
-  _id:string,
-  email:string,
-  password:string,
-  recognisedDevices:string[],
-  userId:string,
+  _id: string,
+  email: string,
+  password: string,
+  recognisedDevices: string[],
+  user: string,
 }
 
 interface IUserAuth extends IUserAuthDocument {
@@ -38,8 +36,8 @@ const UserAuthSchema = new mongoose.Schema<IUserAuthDocument, IUserAuthModel>(
     password: {
       type: String,
       required: true,
-      bcrypt:true,
-      rounds:10
+      bcrypt: true,
+      rounds: 10
     },
     recognisedDevices: [
       {
@@ -47,7 +45,7 @@ const UserAuthSchema = new mongoose.Schema<IUserAuthDocument, IUserAuthModel>(
         required: true,
       },
     ],
-    userId: {
+    user: {
       type: String,
       required: true,
       ref: 'users',

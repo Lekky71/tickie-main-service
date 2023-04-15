@@ -1,12 +1,12 @@
 export const config = {
-  jwtPrivateKey: <string> process.env.JWT_PRIVATE_KEY,
+  jwtPrivateKey: <string>process.env.JWT_PRIVATE_KEY,
   mongodb: {
-    uri: <string> process.env.MONGODB_URI,
+    uri: <string>process.env.MONGODB_URI,
     collections: {
-      userVerifications: 'user_verifications',
-      users: 'users',
-      userAuthTokens:'user_auth_tokens',
-      userAuth:'user_auths'
-    },
-  },
+      userVerifications: "user_verifications",
+      users: "users",
+      userAuthTokens: "user_auth_tokens",
+      userAuth: "user_auths"
+    }
+  }
 };

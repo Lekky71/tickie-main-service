@@ -16,26 +16,28 @@ const userAuthTokenSchema = new mongoose.Schema<IUserAuthToken>(
 
     email: { type: String, required: true, lowercase: true, trim: true, unique: true, },
 
-    userId: {
-      //   type: mongoose.Types.ObjectId,
+    user: {
       type: String,
       required: true,
       ref: 'users',
     },
 
-    // password: { type: String, required: true, bcrypt: true, round: 10 },
+    deviceId: {
+      type: String,
+      required: true,
+    },
   },
 
   {
     toObject: {
-      transform(doc, ret /**_options */) {
+      transform(doc, ret, _options) {
         ret.id = ret._id;
         delete ret._id;
         return ret;
       },
     },
     toJSON: {
-      transform(doc, ret /**_options */) {
+      transform(doc, ret, _options) {
         ret.id = ret._id;
         delete ret._id;
         return ret;
