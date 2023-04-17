@@ -1,11 +1,12 @@
-import { SignupOtpRequest, SignupOtpVerifyRequest } from "../interfaces/auth.requests";
-import { UserAuthDb, UserTokenDb, UserVerificationDb } from "../models";
-import { BadRequestError } from "../interfaces";
-import { generateOtp } from "../helpers/Utils";
+import { SignupOtpRequest, SignupOtpVerifyRequest } from '../interfaces/auth.requests';
+import { AuthType, UserAuthDb, UserDb, UserTokenDb, UserVerificationDb } from '../models';
+import { BadRequestError } from '../interfaces';
+import { generateOtp } from '../helpers/Utils';
 /** I don't want to bloat everywhere with import from the same folder*/
 // import { UserVerificationDb } from '../models/user.verification';
-import { JwtType, OtpType } from "../interfaces/user.verification";
-import { generateToken } from "../helpers/jwt.helper";
+import { JwtType, OtpType } from '../interfaces/user.verification';
+import { generateToken } from '../helpers/jwt.helper';
+import { verifyGoogleToken } from '../helpers/google.helper';
 
 export async function sendSignUoOtp(body: SignupOtpRequest): Promise<void> {
   const { deviceId } = body;
@@ -16,7 +17,7 @@ export async function sendSignUoOtp(body: SignupOtpRequest): Promise<void> {
   const existingAuth = await UserAuthDb.findOne({ email });
   // If in-use, throw error 400
   if (existingAuth) {
-    throw new BadRequestError("Email is already in use");
+    throw new BadRequestError('Email is already in use');
   }
 
   // We do not want users to request OTP within a minute of already requesting for one.
@@ -27,7 +28,7 @@ export async function sendSignUoOtp(body: SignupOtpRequest): Promise<void> {
   });
 
   if (existingVerification) {
-    throw new BadRequestError("OTP has been sent within the minute.");
+    throw new BadRequestError('OTP has been sent within the minute.');
   }
 
   // Generate random otp
@@ -54,9 +55,9 @@ export async function verifySignupOtp(body: SignupOtpVerifyRequest): Promise<str
     otp
   });
   if (!verification) {
-    throw new BadRequestError("Invalid OTP");
+    throw new BadRequestError('Invalid OTP');
   } else if (verification.expiresAt < new Date()) {
-    throw new BadRequestError("OTP has expired");
+    throw new BadRequestError('OTP has expired');
   }
   // Generate the JWT.
   const token = generateToken({
@@ -84,7 +85,7 @@ export async function handleLogin(body: { email: string, password: string, devic
 
   if (!existingUserAuth || !(await existingUserAuth.verifyPassword(password))) {
 
-    throw  new BadRequestError("Invalid login details");
+    throw  new BadRequestError('Invalid login details');
 
   } else if (!existingUserAuth.recognisedDevices.includes(deviceId)) {
     /** generate, save and send a new verification otp for the user*/
@@ -101,7 +102,7 @@ export async function handleLogin(body: { email: string, password: string, devic
     // send email function goes here
 
     /**Break execution of the code*/
-    throw  new BadRequestError("Device not recognised, enter OTP sent to mail to verify");
+    throw  new BadRequestError('Device not recognised, enter OTP sent to mail to verify');
     /** create a verify otp endpoint to verify the otp*/
   }
 
@@ -118,7 +119,8 @@ export async function handleLogin(body: { email: string, password: string, devic
   await UserTokenDb.updateOne({ email, user: existingUserAuth.user }, {
     email,
     token: accessToken,
-    user: existingUserAuth.user
+    user: existingUserAuth.user,
+    deviceId
   }, { upsert: true });
 
   return accessToken;
@@ -133,7 +135,7 @@ export async function handleVerifyLoginDeviceOtp(body: { otp: string, email: str
    *  return true
    */
   const existingUserVer = await UserVerificationDb.findOne({ email, otp, type: OtpType.LOGIN });
-  if (!existingUserVer) throw new BadRequestError("Token expired or invalid");
+  if (!existingUserVer) throw new BadRequestError('Token expired or invalid');
 
   const existingUserAuth = await UserAuthDb.findOne({ email });
 
@@ -154,8 +156,76 @@ export async function handleVerifyLoginDeviceOtp(body: { otp: string, email: str
   await UserTokenDb.updateOne({ email, user: existingUserAuth?.user }, {
     email,
     token: accessToken,
-    user: existingUserAuth?.user
+    user: existingUserAuth?.user,
+    deviceId
   }, { upsert: true });
+
+  return accessToken;
+}
+
+export async function googleAuth(body: { email: string, googleToken: string, deviceId: string }): Promise<string> {
+
+  const { googleToken, deviceId } = body;
+  /**pull it off separately, so I can change it to lowercase */
+  const email = body.email.toLowerCase();
+
+  const existingUserAuth = await UserAuthDb.findOne({ email });
+
+  if (existingUserAuth && (existingUserAuth.type === AuthType.EMAIL)) {
+    throw new BadRequestError('Email already signed up with email and password');
+  }
+
+  // If user is already signed up with Google, just return the token.
+  if (existingUserAuth) {
+    if (!existingUserAuth.recognisedDevices.includes(deviceId)) {
+      existingUserAuth.recognisedDevices.push(deviceId);
+      await existingUserAuth.save();
+    }
+    const accessToken = generateToken({
+      email,
+      deviceId,
+      type: JwtType.USER,
+      userId: existingUserAuth.user
+    });
+    return accessToken;
+  }
+
+// If user is not signed up, sign them up.
+  const { email: googleEmail, name, picture } = await verifyGoogleToken(googleToken);
+  if (email.toLowerCase() !== googleEmail?.toUpperCase()) {
+    throw new BadRequestError('Email does not match Google account');
+  }
+  // Create the user.
+  const newUser = new UserDb({
+    fullName: name,
+    email,
+    avatar: picture
+  });
+  await newUser.save();
+  // Create the user auth.
+  const newUserAuth = new UserAuthDb({
+    email,
+    type: AuthType.GOOGLE,
+    user: newUser._id,
+    recognisedDevices: [deviceId]
+  });
+  await newUserAuth.save();
+
+  /**generate and save access_token for user*/
+  const accessToken = generateToken(
+    {
+      email,
+      deviceId,
+      type: JwtType.USER,
+      userId: newUserAuth.user
+    });
+
+  await UserTokenDb.create({
+    email,
+    token: accessToken,
+    user: newUserAuth.user,
+    deviceId
+  });
 
   return accessToken;
 }

@@ -86,7 +86,7 @@ paths:
                   message:
                     type: string
                 example:
-                  { "message": "device verification token expired or invalid"}
+                  { "message": "device verification token expired or invalid" }
 
   /user/auth/signup:
     post:
@@ -153,6 +153,27 @@ paths:
                     type: string
                 example:
                   { "message": "Device not recognised, enter OTP sent to mail to verify" }
+
+  /user/auth/google-auth:
+    post:
+      tags:
+        - onboarding
+      operationId: AuthWithGoogle
+      summary: 'Endpoint to receive Google Auth Token and get the user signed in'
+      parameters:
+        - $ref: '#/components/parameters/DeviceID'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GoogleAuthRequest'
+      responses:
+        200:
+          description: 'Auth token is returned'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenResponse'
 
   /user/me:
     get:
@@ -317,7 +338,7 @@ components:
           type: string
           format: email
       example:
-#        id: sdgweqgwerg
+        #        id: sdgweqgwerg
         fullName: Myke Dunsimi
         email: user@example.com
 
@@ -330,7 +351,7 @@ components:
         password:
           type: string
           format: password
-          pattern: "^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$"
+          pattern: '^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$'
         fullName:
           type: string
 
@@ -351,4 +372,12 @@ components:
           type: string
           format: email
         password:
+          type: string
+
+    GoogleAuthRequest:
+      type: object
+      properties:
+        email:
+          type: string
+        googleToken:
           type: string

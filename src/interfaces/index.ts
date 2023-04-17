@@ -3,4 +3,4 @@ export * from './IExpressRequest';
 export * from './ILogger';
 export * from './IPagination';
 export * from './user.auth';
-export * from './user'
+export * from './user';

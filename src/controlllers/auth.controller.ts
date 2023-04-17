@@ -1,7 +1,7 @@
-import {IExpressRequest} from '../interfaces';
-import { Response as ExpressResponse } from 'express';
+import { IExpressRequest } from '../interfaces';
+import { Request, Response as ExpressResponse } from 'express';
 import * as authService from '../services/auth.service';
-import * as ResponseManager from '../helpers/response.manager'
+import * as ResponseManager from '../helpers/response.manager';
 
 export async function handleSignUpOtpRequest(req: IExpressRequest, res: ExpressResponse): Promise<void> {
   const { email } = req.body;
@@ -14,7 +14,7 @@ export async function handleSignUpOtpRequest(req: IExpressRequest, res: ExpressR
   try {
     await authService.sendSignUoOtp({
       email,
-      deviceId: <string>deviceId,
+      deviceId: <string>deviceId
     });
     ResponseManager.success(res, { message: 'OTP sent successfully' });
   } catch (err: any) {
@@ -31,7 +31,7 @@ export async function handleVerifySignupOtp(req: IExpressRequest, res: ExpressRe
     const token = await authService.verifySignupOtp({
       email,
       otp,
-      deviceId: <string>deviceId,
+      deviceId: <string>deviceId
     });
     ResponseManager.success(res, { token });
   } catch (err: any) {
@@ -39,24 +39,44 @@ export async function handleVerifySignupOtp(req: IExpressRequest, res: ExpressRe
   }
 }
 
-export async function  handleLoginToAccount(req:IExpressRequest, res:ExpressResponse):Promise<void> {
+export async function handleLoginToAccount(req: IExpressRequest, res: ExpressResponse): Promise<void> {
   const deviceId = req.headers['x-device-id'];
   const { email, password } = req.body;
   try {
-    const response = await authService.handleLogin({ email, password, deviceId: <string>deviceId })
-    ResponseManager.success(res, { response })
+    const response = await authService.handleLogin({ email, password, deviceId: <string>deviceId });
+    ResponseManager.success(res, { response });
   } catch (err: any) {
-    ResponseManager.handleError(res, err)
+    ResponseManager.handleError(res, err);
   }
 }
 
-export async  function handleLoginToAccountOtp(req:IExpressRequest, res:ExpressResponse):Promise<void>{
-  const deviceId =req.headers['x-device-id'];
-  const {email, otp,trustDevice}=req.body;
+export async function handleLoginToAccountOtp(req: IExpressRequest, res: ExpressResponse): Promise<void> {
+  const deviceId = req.headers['x-device-id'];
+  const { email, otp, trustDevice } = req.body;
   try {
-    const response= await  authService.handleVerifyLoginDeviceOtp({otp, email, deviceId:<string>deviceId, trustDevice})
-    ResponseManager.success(res, { response })
-  }catch (err:any){
-    ResponseManager.handleError(res, err)
+    const response = await authService.handleVerifyLoginDeviceOtp({
+      otp,
+      email,
+      deviceId: <string>deviceId,
+      trustDevice
+    });
+    ResponseManager.success(res, { response });
+  } catch (err: any) {
+    ResponseManager.handleError(res, err);
+  }
+}
+
+export async function handleGoogleAuth(req: Request, res: ExpressResponse): Promise<void> {
+  const deviceId = req.headers['x-device-id'];
+  const { email, googleToken } = req.body;
+  try {
+    const response = await authService.googleAuth({
+      email,
+      deviceId: <string>deviceId,
+      googleToken
+    });
+    ResponseManager.success(res, { response });
+  } catch (err: any) {
+    ResponseManager.handleError(res, err);
   }
 }
