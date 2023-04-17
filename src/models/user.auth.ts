@@ -2,13 +2,17 @@ import mongoose, { Model } from 'mongoose';
 import { config } from '../constants/settings';
 import { v4 as uuidv4 } from 'uuid';
 
-
+export enum AuthType {
+  EMAIL = "email",
+  GOOGLE = "google",
+}
 interface IUserAuthDocument {
   _id: string,
   email: string,
   password: string,
   recognisedDevices: string[],
   user: string,
+  type: AuthType,
 }
 
 interface IUserAuth extends IUserAuthDocument {
@@ -35,21 +39,26 @@ const UserAuthSchema = new mongoose.Schema<IUserAuthDocument, IUserAuthModel>(
     },
     password: {
       type: String,
-      required: true,
+      required: false,
       bcrypt: true,
       rounds: 10
     },
     recognisedDevices: [
       {
         type: String,
-        required: true,
-      },
+        required: true
+      }
     ],
     user: {
       type: String,
       required: true,
-      ref: 'users',
+      ref: "users"
     },
+    type: {
+      type: String,
+      enum: Object.values(AuthType),
+      default: AuthType.EMAIL
+    }
   },
   {
     toObject: {

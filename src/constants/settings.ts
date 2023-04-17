@@ -8,5 +8,11 @@ export const config = {
       userAuthTokens: "user_auth_tokens",
       userAuth: "user_auths"
     }
+  },
+  google: {
+    clientID: <string>process.env.GOOGLE_CLIENT_ID
+  },
+  redis: {
+    uri: <string>process.env.REDIS_URI
   }
 };

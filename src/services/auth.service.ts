@@ -1,11 +1,12 @@
 import { SignupOtpRequest, SignupOtpVerifyRequest } from "../interfaces/auth.requests";
-import { UserAuthDb, UserTokenDb, UserVerificationDb } from "../models";
+import { AuthType, UserAuthDb, UserDb, UserTokenDb, UserVerificationDb } from "../models";
 import { BadRequestError } from "../interfaces";
 import { generateOtp } from "../helpers/Utils";
 /** I don't want to bloat everywhere with import from the same folder*/
 // import { UserVerificationDb } from '../models/user.verification';
 import { JwtType, OtpType } from "../interfaces/user.verification";
 import { generateToken } from "../helpers/jwt.helper";
+import { verifyGoogleToken } from "../helpers/google.helper";
 
 export async function sendSignUoOtp(body: SignupOtpRequest): Promise<void> {
   const { deviceId } = body;
@@ -118,7 +119,8 @@ export async function handleLogin(body: { email: string, password: string, devic
   await UserTokenDb.updateOne({ email, user: existingUserAuth.user }, {
     email,
     token: accessToken,
-    user: existingUserAuth.user
+    user: existingUserAuth.user,
+    deviceId
   }, { upsert: true });
 
   return accessToken;
@@ -154,8 +156,76 @@ export async function handleVerifyLoginDeviceOtp(body: { otp: string, email: str
   await UserTokenDb.updateOne({ email, user: existingUserAuth?.user }, {
     email,
     token: accessToken,
-    user: existingUserAuth?.user
+    user: existingUserAuth?.user,
+    deviceId
   }, { upsert: true });
+
+  return accessToken;
+}
+
+export async function googleAuth(body: { email: string, googleToken: string, deviceId: string }): Promise<string> {
+
+  const { googleToken, deviceId } = body;
+  /**pull it off separately, so I can change it to lowercase */
+  const email = body.email.toLowerCase();
+
+  const existingUserAuth = await UserAuthDb.findOne({ email });
+
+  if (existingUserAuth && (existingUserAuth.type === AuthType.EMAIL)) {
+    throw new BadRequestError("Email already signed up with email and password");
+  }
+
+  // If user is already signed up with Google, just return the token.
+  if (existingUserAuth) {
+    if (!existingUserAuth.recognisedDevices.includes(deviceId)) {
+      existingUserAuth.recognisedDevices.push(deviceId);
+      await existingUserAuth.save();
+    }
+    const accessToken = generateToken({
+      email,
+      deviceId,
+      type: JwtType.USER,
+      userId: existingUserAuth.user
+    });
+    return accessToken;
+  }
+
+// If user is not signed up, sign them up.
+  const { email: googleEmail, name, picture } = await verifyGoogleToken(googleToken);
+  if (email.toLowerCase() !== googleEmail?.toUpperCase()) {
+    throw new BadRequestError("Email does not match Google account");
+  }
+  // Create the user.
+  const newUser = new UserDb({
+    fullName: name,
+    email,
+    avatar: picture
+  });
+  await newUser.save();
+  // Create the user auth.
+  const newUserAuth = new UserAuthDb({
+    email,
+    type: AuthType.GOOGLE,
+    user: newUser._id,
+    recognisedDevices: [deviceId]
+  });
+  await newUserAuth.save();
+
+  /**generate and save access_token for user*/
+  const accessToken = generateToken(
+    {
+      email,
+      deviceId,
+      type: JwtType.USER,
+      userId: newUserAuth.user
+    });
+
+  await UserTokenDb.create({
+    email,
+    token: accessToken,
+    user: newUserAuth.user,
+    deviceId
+  });
 
   return accessToken;
 }

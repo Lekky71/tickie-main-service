@@ -21,7 +21,6 @@ const userAuthTokenSchema = new mongoose.Schema<IUserAuthToken>(
       required: true,
       ref: 'users',
     },
-
     deviceId: {
       type: String,
       required: true,

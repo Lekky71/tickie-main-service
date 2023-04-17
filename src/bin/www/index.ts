@@ -3,7 +3,8 @@ import errorHandler from 'errorhandler';
 
 import app from '../../app';
 import { Logger } from '../../helpers/Logger';
-import { connectMongo } from '../../helpers/mongodb.connector';
+import { connectMongo } from "../../helpers/mongodb.connector";
+import { connectRedis } from "../../helpers/redis.connector";
 
 app.use(errorHandler());
 
@@ -15,6 +16,7 @@ app.use(errorHandler());
     Logger.Info('Press CTRL+C to stop\n');
     Logger.Info('Connecting to MongoDB...');
     connectMongo();
+    connectRedis();
   });
 
   // Nodemon dev hack

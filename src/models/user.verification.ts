@@ -27,8 +27,8 @@ const UserVerificationSchema = new Schema({
   },
   type: {
     type: String, // one of sign-up, login, forgot-password
-    enum: Object.keys(OtpType),
-    required: true,
+    enum: Object.values(OtpType),
+    required: true
   },
   expiresAt: {
     type: Date,
