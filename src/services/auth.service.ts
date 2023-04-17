@@ -5,8 +5,16 @@ import { generateOtp } from '../helpers/Utils';
 /** I don't want to bloat everywhere with import from the same folder*/
 // import { UserVerificationDb } from '../models/user.verification';
 import { JwtType, OtpType } from '../interfaces/user.verification';
-import { generateToken } from '../helpers/jwt.helper';
+import { JwtHelper } from '../helpers/jwt.helper';
 import { verifyGoogleToken } from '../helpers/google.helper';
+import { config } from '../constants/settings';
+import { redisClient } from '../helpers/redis.connector';
+
+const jwtHelper = new JwtHelper({
+  privateKey: config.jwtPrivateKey,
+  UserTokenDb,
+  redisClient: redisClient,
+});
 
 export async function sendSignUoOtp(body: SignupOtpRequest): Promise<void> {
   const { deviceId } = body;
@@ -60,7 +68,7 @@ export async function verifySignupOtp(body: SignupOtpVerifyRequest): Promise<str
     throw new BadRequestError('OTP has expired');
   }
   // Generate the JWT.
-  const token = generateToken({
+  const token = jwtHelper.generateToken({
     email,
     deviceId,
     type: JwtType.NEW_USER
@@ -107,7 +115,7 @@ export async function handleLogin(body: { email: string, password: string, devic
   }
 
   /**generate and save access_token for user*/
-  const accessToken = generateToken(
+  const accessToken = jwtHelper.generateToken(
     {
       email,
       deviceId,
@@ -144,7 +152,7 @@ export async function handleVerifyLoginDeviceOtp(body: { otp: string, email: str
   }
 
   /**send a login token to the user*/
-  const accessToken = generateToken(
+  const accessToken = jwtHelper.generateToken(
     {
       email,
       deviceId,
@@ -181,7 +189,7 @@ export async function googleAuth(body: { email: string, googleToken: string, dev
       existingUserAuth.recognisedDevices.push(deviceId);
       await existingUserAuth.save();
     }
-    const accessToken = generateToken({
+    const accessToken = jwtHelper.generateToken({
       email,
       deviceId,
       type: JwtType.USER,
@@ -212,7 +220,7 @@ export async function googleAuth(body: { email: string, googleToken: string, dev
   await newUserAuth.save();
 
   /**generate and save access_token for user*/
-  const accessToken = generateToken(
+  const accessToken = jwtHelper.generateToken(
     {
       email,
       deviceId,

@@ -71,7 +71,7 @@ paths:
               $ref: '#/components/schemas/LoginVerifyDeviceChangeOtpRequest'
       responses:
         200:
-          description: 'Device verification successful, login token is returned
+          description: 'Device verification successful, login token is returned'
           content:
             application/json:
               schema:

@@ -17,14 +17,14 @@ export async function connectMongo() {
   });
 
   // If the Node process ends, close the Mongoose connection
-  process.on('SIGINT', () => {
-    mongoose.connection.close(true).then(() => {
+  process.on('SIGINT', async () => {
+    try {
+      await mongoose.connection.close(true);
       console.info('Mongoose default connection disconnected through app termination');
-      process.exit(0);
-    })
-      .catch((err) => {
-        console.error('Could not close MongoDB Connection');
-        console.error(err);
-      });
+    } catch (err) {
+      console.error('Could not close Mongoose Connection');
+      console.error(err);
+    }
+    process.exit(0);
   });
 }
