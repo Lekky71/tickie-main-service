@@ -1,11 +1,11 @@
-import { IExpressRequest } from "../interfaces";
-import { Request, Response as ExpressResponse } from "express";
-import * as authService from "../services/auth.service";
-import * as ResponseManager from "../helpers/response.manager";
+import { IExpressRequest } from '../interfaces';
+import { Request, Response as ExpressResponse } from 'express';
+import * as authService from '../services/auth.service';
+import * as ResponseManager from '../helpers/response.manager';
 
 export async function handleSignUpOtpRequest(req: IExpressRequest, res: ExpressResponse): Promise<void> {
   const { email } = req.body;
-  const deviceId = req.headers["x-device-id"];
+  const deviceId = req.headers['x-device-id'];
 
   // service layer
   // Get result from service layer.
@@ -16,7 +16,7 @@ export async function handleSignUpOtpRequest(req: IExpressRequest, res: ExpressR
       email,
       deviceId: <string>deviceId
     });
-    ResponseManager.success(res, { message: "OTP sent successfully" });
+    ResponseManager.success(res, { message: 'OTP sent successfully' });
   } catch (err: any) {
     // Error handling
     ResponseManager.handleError(res, err);
@@ -25,7 +25,7 @@ export async function handleSignUpOtpRequest(req: IExpressRequest, res: ExpressR
 
 export async function handleVerifySignupOtp(req: IExpressRequest, res: ExpressResponse): Promise<void> {
   const { email, otp } = req.body;
-  const deviceId = req.headers["x-device-id"];
+  const deviceId = req.headers['x-device-id'];
 
   try {
     const token = await authService.verifySignupOtp({
@@ -40,7 +40,7 @@ export async function handleVerifySignupOtp(req: IExpressRequest, res: ExpressRe
 }
 
 export async function handleLoginToAccount(req: IExpressRequest, res: ExpressResponse): Promise<void> {
-  const deviceId = req.headers["x-device-id"];
+  const deviceId = req.headers['x-device-id'];
   const { email, password } = req.body;
   try {
     const response = await authService.handleLogin({ email, password, deviceId: <string>deviceId });
@@ -51,7 +51,7 @@ export async function handleLoginToAccount(req: IExpressRequest, res: ExpressRes
 }
 
 export async function handleLoginToAccountOtp(req: IExpressRequest, res: ExpressResponse): Promise<void> {
-  const deviceId = req.headers["x-device-id"];
+  const deviceId = req.headers['x-device-id'];
   const { email, otp, trustDevice } = req.body;
   try {
     const response = await authService.handleVerifyLoginDeviceOtp({
@@ -67,7 +67,7 @@ export async function handleLoginToAccountOtp(req: IExpressRequest, res: Express
 }
 
 export async function handleGoogleAuth(req: Request, res: ExpressResponse): Promise<void> {
-  const deviceId = req.headers["x-device-id"];
+  const deviceId = req.headers['x-device-id'];
   const { email, googleToken } = req.body;
   try {
     const response = await authService.googleAuth({

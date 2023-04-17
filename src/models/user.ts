@@ -1,7 +1,7 @@
-import * as mongoose from "mongoose";
-import { Schema } from "mongoose";
-import { config } from "../constants/settings";
-import { v4 as uuidv4 } from "uuid";
+import * as mongoose from 'mongoose';
+import { Schema } from 'mongoose';
+import { config } from '../constants/settings';
+import { v4 as uuidv4 } from 'uuid';
 
 const UserSchema = new Schema({
   _id: {

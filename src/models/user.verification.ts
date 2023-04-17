@@ -1,6 +1,5 @@
-import { Schema } from 'mongoose';
-import * as crypto from 'crypto';
 import * as mongoose from 'mongoose';
+import { Schema } from 'mongoose';
 import { config } from '../constants/settings';
 import { OtpType } from '../interfaces/user.verification';
 import { v4 as uuidv4 } from 'uuid';

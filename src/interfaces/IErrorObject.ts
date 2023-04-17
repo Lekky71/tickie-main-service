@@ -10,13 +10,13 @@ export interface IErrorObject extends Error {
 export class BadRequestError extends CustomError {
   constructor(msg: string) {
     super(400, msg);
-    this.name = "BadRequestError";
+    this.name = 'BadRequestError';
   }
 }
 
 export class UnAuthorizedError extends CustomError {
   constructor(msg?: string) {
-    super(401, msg || "UnAuthorized");
-    this.name = "UnAuthorizedError";
+    super(401, msg || 'UnAuthorized');
+    this.name = 'UnAuthorizedError';
   }
 }

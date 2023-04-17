@@ -3,8 +3,8 @@ import errorHandler from 'errorhandler';
 
 import app from '../../app';
 import { Logger } from '../../helpers/Logger';
-import { connectMongo } from "../../helpers/mongodb.connector";
-import { connectRedis } from "../../helpers/redis.connector";
+import { connectMongo } from '../../helpers/mongodb.connector';
+import { connectRedis } from '../../helpers/redis.connector';
 
 app.use(errorHandler());
 

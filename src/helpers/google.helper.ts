@@ -1,6 +1,6 @@
-import { OAuth2Client, TokenPayload } from "google-auth-library";
-import { config } from "../constants/settings";
-import { UnAuthorizedError } from "../interfaces";
+import { OAuth2Client, TokenPayload } from 'google-auth-library';
+import { config } from '../constants/settings';
+import { UnAuthorizedError } from '../interfaces';
 
 const client = new OAuth2Client(config.google.clientID);
 
