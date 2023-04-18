@@ -1,6 +1,5 @@
 import { createClient } from 'redis';
 import { config } from '../constants/settings';
-import mongoose from 'mongoose';
 
 const client = createClient({
   url: config.redis.uri

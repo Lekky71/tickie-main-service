@@ -5,4 +5,6 @@ export interface User extends Document {
   email: string;
   fullName: string;
   avatar?: string;
+  createdAt: string;
+  updatedAt: string;
 }
