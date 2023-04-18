@@ -8,3 +8,11 @@ export interface SignupOtpVerifyRequest {
   deviceId: string;
   otp: string;
 }
+
+export interface SignUpTokenRequest{
+  fullName:string;
+  password:string;
+  email:any;
+  avatar:string;
+  deviceId:string;
+}

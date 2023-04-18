@@ -1,4 +1,4 @@
-import { SignupOtpRequest, SignupOtpVerifyRequest } from '../interfaces/auth.requests';
+import { SignupOtpRequest, SignupOtpVerifyRequest, SignUpTokenRequest } from '../interfaces/auth.requests';
 import { AuthType, UserAuthDb, UserDb, UserTokenDb, UserVerificationDb } from '../models';
 import { BadRequestError } from '../interfaces';
 import { generateOtp } from '../helpers/Utils';
@@ -32,7 +32,7 @@ export async function sendSignUoOtp(body: SignupOtpRequest): Promise<void> {
   const existingVerification = await UserVerificationDb.findOne({
     email,
     deviceId,
-    createdAt: { $gte: Date.now() - (60000) }
+    createdAt: { $gte: Date.now() - 60000 },
   });
 
   if (existingVerification) {
@@ -46,7 +46,7 @@ export async function sendSignUoOtp(body: SignupOtpRequest): Promise<void> {
     otp,
     deviceId,
     type: OtpType.SIGN_UP,
-    expiresAt: new Date(Date.now() + (10 * 60 * 1000))
+    expiresAt: new Date(Date.now() + 10 * 60 * 1000),
   });
   // Save the record
   await newVer.save();
@@ -60,7 +60,7 @@ export async function verifySignupOtp(body: SignupOtpVerifyRequest): Promise<str
   const verification = await UserVerificationDb.findOne({
     email,
     deviceId,
-    otp
+    otp,
   });
   if (!verification) {
     throw new BadRequestError('Invalid OTP');
@@ -71,20 +71,42 @@ export async function verifySignupOtp(body: SignupOtpVerifyRequest): Promise<str
   const token = jwtHelper.generateToken({
     email,
     deviceId,
-    type: JwtType.NEW_USER
+    type: JwtType.NEW_USER,
   });
 
   // delete used record
   await UserVerificationDb.deleteOne({
     email,
     deviceId,
-    otp
+    otp,
   });
   return token;
 }
 
-export async function handleLogin(body: { email: string, password: string, deviceId: string }): Promise<string> {
+export async function handleSingnupWithToken(body: SignUpTokenRequest): Promise<object> {
+  const { fullName, avatar, password, email, deviceId } = body;
 
+  const user = new UserDb({
+    email,
+    fullName,
+    avatar,
+  });
+
+  const newUser = await user.save();
+
+  const userAuth = new UserAuthDb({
+    email,
+    password,
+    recognisedDevices: deviceId,
+    user: newUser._id,
+  });
+
+  await userAuth.save()
+
+  return newUser
+}
+
+export async function handleLogin(body: { email: string; password: string; deviceId: string }): Promise<string> {
   const { password, deviceId } = body;
   /**pull it off separately, so I can change it to lowercase */
   const email = body.email.toLowerCase();
@@ -92,49 +114,61 @@ export async function handleLogin(body: { email: string, password: string, devic
   const existingUserAuth = await UserAuthDb.findOne({ email });
 
   if (!existingUserAuth || !(await existingUserAuth.verifyPassword(password))) {
-
-    throw  new BadRequestError('Invalid login details');
-
+    throw new BadRequestError('Invalid login details');
   } else if (!existingUserAuth.recognisedDevices.includes(deviceId)) {
     /** generate, save and send a new verification otp for the user*/
     const otp = generateOtp();
 
     /**upsert-true...  */
-    await UserVerificationDb.updateOne({ email }, {
-      email, otp, deviceId, type: OtpType.LOGIN,
-      expiresAt: new Date(Date.now() + (10 * 60 * 1000)),
-      user: existingUserAuth.user
-
-    }, { upsert: true });
+    await UserVerificationDb.updateOne(
+      { email },
+      {
+        email,
+        otp,
+        deviceId,
+        type: OtpType.LOGIN,
+        expiresAt: new Date(Date.now() + 10 * 60 * 1000),
+        user: existingUserAuth.user,
+      },
+      { upsert: true },
+    );
 
     // send email function goes here
 
     /**Break execution of the code*/
-    throw  new BadRequestError('Device not recognised, enter OTP sent to mail to verify');
+    throw new BadRequestError('Device not recognised, enter OTP sent to mail to verify');
     /** create a verify otp endpoint to verify the otp*/
   }
 
   /**generate and save access_token for user*/
-  const accessToken = jwtHelper.generateToken(
-    {
-      email,
-      deviceId,
-      type: JwtType.USER,
-      userId: existingUserAuth.user
-    });
+  const accessToken = jwtHelper.generateToken({
+    email,
+    deviceId,
+    type: JwtType.USER,
+    userId: existingUserAuth.user,
+  });
 
   /**for first time login -> upsert-true*/
-  await UserTokenDb.updateOne({ email, user: existingUserAuth.user }, {
-    email,
-    token: accessToken,
-    user: existingUserAuth.user,
-    deviceId
-  }, { upsert: true });
+  await UserTokenDb.updateOne(
+    { email, user: existingUserAuth.user },
+    {
+      email,
+      token: accessToken,
+      user: existingUserAuth.user,
+      deviceId,
+    },
+    { upsert: true },
+  );
 
   return accessToken;
 }
 
-export async function handleVerifyLoginDeviceOtp(body: { otp: string, email: string, deviceId: string, trustDevice: boolean }): Promise<string> {
+export async function handleVerifyLoginDeviceOtp(body: {
+  otp: string;
+  email: string;
+  deviceId: string;
+  trustDevice: boolean;
+}): Promise<string> {
   const { otp, email, deviceId, trustDevice } = body;
 
   /** find userVerification with the provided email
@@ -152,34 +186,36 @@ export async function handleVerifyLoginDeviceOtp(body: { otp: string, email: str
   }
 
   /**send a login token to the user*/
-  const accessToken = jwtHelper.generateToken(
-    {
-      email,
-      deviceId,
-      type: JwtType.USER,
-      userId: existingUserAuth?.user
-    });
+  const accessToken = jwtHelper.generateToken({
+    email,
+    deviceId,
+    type: JwtType.USER,
+    userId: existingUserAuth?.user,
+  });
 
   /**for first time login -> upsert-true*/
-  await UserTokenDb.updateOne({ email, user: existingUserAuth?.user }, {
-    email,
-    token: accessToken,
-    user: existingUserAuth?.user,
-    deviceId
-  }, { upsert: true });
+  await UserTokenDb.updateOne(
+    { email, user: existingUserAuth?.user },
+    {
+      email,
+      token: accessToken,
+      user: existingUserAuth?.user,
+      deviceId,
+    },
+    { upsert: true },
+  );
 
   return accessToken;
 }
 
-export async function googleAuth(body: { email: string, googleToken: string, deviceId: string }): Promise<string> {
-
+export async function googleAuth(body: { email: string; googleToken: string; deviceId: string }): Promise<string> {
   const { googleToken, deviceId } = body;
   /**pull it off separately, so I can change it to lowercase */
   const email = body.email.toLowerCase();
 
   const existingUserAuth = await UserAuthDb.findOne({ email });
 
-  if (existingUserAuth && (existingUserAuth.type === AuthType.EMAIL)) {
+  if (existingUserAuth && existingUserAuth.type === AuthType.EMAIL) {
     throw new BadRequestError('Email already signed up with email and password');
   }
 
@@ -193,12 +229,12 @@ export async function googleAuth(body: { email: string, googleToken: string, dev
       email,
       deviceId,
       type: JwtType.USER,
-      userId: existingUserAuth.user
+      userId: existingUserAuth.user,
     });
     return accessToken;
   }
 
-// If user is not signed up, sign them up.
+  // If user is not signed up, sign them up.
   const { email: googleEmail, name, picture } = await verifyGoogleToken(googleToken);
   if (email.toLowerCase() !== googleEmail?.toUpperCase()) {
     throw new BadRequestError('Email does not match Google account');
@@ -207,7 +243,7 @@ export async function googleAuth(body: { email: string, googleToken: string, dev
   const newUser = new UserDb({
     fullName: name,
     email,
-    avatar: picture
+    avatar: picture,
   });
   await newUser.save();
   // Create the user auth.
@@ -215,24 +251,23 @@ export async function googleAuth(body: { email: string, googleToken: string, dev
     email,
     type: AuthType.GOOGLE,
     user: newUser._id,
-    recognisedDevices: [deviceId]
+    recognisedDevices: [deviceId],
   });
   await newUserAuth.save();
 
   /**generate and save access_token for user*/
-  const accessToken = jwtHelper.generateToken(
-    {
-      email,
-      deviceId,
-      type: JwtType.USER,
-      userId: newUserAuth.user
-    });
+  const accessToken = jwtHelper.generateToken({
+    email,
+    deviceId,
+    type: JwtType.USER,
+    userId: newUserAuth.user,
+  });
 
   await UserTokenDb.create({
     email,
     token: accessToken,
     user: newUserAuth.user,
-    deviceId
+    deviceId,
   });
 
   return accessToken;
