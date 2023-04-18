@@ -42,13 +42,12 @@ export async function handleVerifySignupOtp(req: IExpressRequest, res: ExpressRe
 
 export async function handleSingnupWithToken(req:IExpressRequest,res: ExpressResponse) : Promise <void>{
 
-  const {fullName,avatar,password} = req.body
+  const {fullName,password} = req.body
   const email = req.email
   const deviceId = req.headers['x-device-id'];
   try{
     const user = await authService.handleSingnupWithToken({
       fullName,
-      avatar,
       email,
       password,
       deviceId: <string>deviceId,

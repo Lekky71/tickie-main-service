@@ -84,12 +84,11 @@ export async function verifySignupOtp(body: SignupOtpVerifyRequest): Promise<str
 }
 
 export async function handleSingnupWithToken(body: SignUpTokenRequest): Promise<object> {
-  const { fullName, avatar, password, email, deviceId } = body;
+  const { fullName, password, email, deviceId } = body;
 
   const user = new UserDb({
     email,
     fullName,
-    avatar,
   });
 
   const newUser = await user.save();

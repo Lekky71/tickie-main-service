@@ -13,6 +13,5 @@ export interface SignUpTokenRequest{
   fullName:string;
   password:string;
   email:any;
-  avatar:string;
   deviceId:string;
 }
