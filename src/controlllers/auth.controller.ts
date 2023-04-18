@@ -23,6 +23,7 @@ export async function handleSignUpOtpRequest(req: IExpressRequest, res: ExpressR
   }
 }
 
+
 export async function handleVerifySignupOtp(req: IExpressRequest, res: ExpressResponse): Promise<void> {
   const { email, otp } = req.body;
   const deviceId = req.headers['x-device-id'];
@@ -38,6 +39,32 @@ export async function handleVerifySignupOtp(req: IExpressRequest, res: ExpressRe
     ResponseManager.handleError(res, err);
   }
 }
+
+export async function handleSingnupWithToken(req:IExpressRequest,res: ExpressResponse) : Promise <void>{
+
+  const {fullName,password} = req.body
+  const email = req.email
+  const deviceId = req.headers['x-device-id'];
+  try{
+    const user = await authService.handleSingnupWithToken({
+      fullName,
+      email,
+      password,
+      deviceId: <string>deviceId,
+    });
+    ResponseManager.success(res, { user });
+
+
+  }catch(err:any){
+    ResponseManager.handleError(res, err);
+
+  }
+
+
+
+
+}
+
 
 export async function handleLoginToAccount(req: IExpressRequest, res: ExpressResponse): Promise<void> {
   const deviceId = req.headers['x-device-id'];
