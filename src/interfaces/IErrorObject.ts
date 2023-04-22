@@ -20,3 +20,10 @@ export class UnAuthorizedError extends CustomError {
     this.name = 'UnAuthorizedError';
   }
 }
+
+export class NotFoundError extends CustomError {
+  constructor(msg?: string) {
+    super(404, msg || 'NotFoundError');
+    this.name = 'NotFoundError';
+  }
+}

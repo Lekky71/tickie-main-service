@@ -4,12 +4,12 @@ import { BadRequestError, User } from '../interfaces';
 import { generateOtp } from '../helpers/Utils';
 /** I don't want to bloat everywhere with import from the same folder*/
 // import { UserVerificationDb } from '../models/user.verification';
-import { JwtType, OtpType } from '../interfaces/user.verification';
+import { JwtType, OtpType, UserVerification } from '../interfaces/user.verification';
 import { JwtHelper } from '../helpers/jwt.helper';
 import { verifyGoogleToken } from '../helpers/google.helper';
 import { config } from '../constants/settings';
 import { redisClient } from '../helpers/redis.connector';
-import { SignUpResponse } from '../interfaces/auth.responses';
+import { LoginResponse, SignUpResponse } from '../interfaces/auth.responses';
 
 const jwtHelper = new JwtHelper({
   privateKey: config.jwtPrivateKey,
@@ -58,14 +58,14 @@ export async function verifySignupOtp(body: SignupOtpVerifyRequest): Promise<str
   const { deviceId, otp } = body;
   let { email } = body;
   email = email.toLowerCase();
-  const verification = await UserVerificationDb.findOne({
+  const verification = await UserVerificationDb.findOne<UserVerification>({
     email,
     deviceId,
     otp,
   });
   if (!verification) {
     throw new BadRequestError('Invalid OTP');
-  } else if (verification.expiresAt < new Date()) {
+  } else if (new Date(verification.expiresAt) < new Date()) {
     throw new BadRequestError('OTP has expired');
   }
   // Generate the JWT.
@@ -76,11 +76,7 @@ export async function verifySignupOtp(body: SignupOtpVerifyRequest): Promise<str
   });
 
   // delete used record
-  await UserVerificationDb.deleteOne({
-    email,
-    deviceId,
-    otp,
-  });
+  verification.deleteOne();
   return token;
 }
 
@@ -124,7 +120,7 @@ export async function signUpWithToken(body: SignUpTokenRequest): Promise<SignUpR
   }
 }
 
-export async function handleLogin(body: { email: string; password: string; deviceId: string }): Promise<string> {
+export async function login(body: { email: string; password: string; deviceId: string }): Promise<LoginResponse> {
   const { password, deviceId } = body;
   /**pull it off separately, so I can change it to lowercase */
   const email = body.email.toLowerCase();
@@ -178,15 +174,19 @@ export async function handleLogin(body: { email: string; password: string; devic
     { upsert: true },
   );
 
-  return accessToken;
+  const user = await UserDb.findById<User>(existingUserAuth.user);
+  return {
+    token: accessToken,
+    user: user!,
+  };
 }
 
-export async function handleVerifyLoginDeviceOtp(body: {
+export async function verifyLoginDeviceOtp(body: {
   otp: string;
   email: string;
   deviceId: string;
   trustDevice: boolean;
-}): Promise<string> {
+}): Promise<LoginResponse> {
   const { otp, email, deviceId, trustDevice } = body;
 
   /** find userVerification with the provided email
@@ -194,10 +194,16 @@ export async function handleVerifyLoginDeviceOtp(body: {
    *  if yes? add to recognised device
    *  return true
    */
-  const existingUserVer = await UserVerificationDb.findOne({ email, otp, type: OtpType.LOGIN });
-  if (!existingUserVer) throw new BadRequestError('Token expired or invalid');
+  const existingUserVer = await UserVerificationDb.findOne<UserVerification>({ email, otp, type: OtpType.LOGIN });
+  if (!existingUserVer) {
+    throw new BadRequestError('Token expired or invalid');
+  }
 
   const existingUserAuth = await UserAuthDb.findOne({ email });
+
+  if (!existingUserAuth) {
+    throw new BadRequestError('User not found');
+  }
 
   if (trustDevice) {
     existingUserAuth?.recognisedDevices.push(deviceId);
@@ -213,7 +219,7 @@ export async function handleVerifyLoginDeviceOtp(body: {
 
   /**for first time login -> upsert-true*/
   await UserTokenDb.updateOne(
-    { email, user: existingUserAuth?.user },
+    { email, user: existingUserAuth.user },
     {
       email,
       token: accessToken,
@@ -223,10 +229,16 @@ export async function handleVerifyLoginDeviceOtp(body: {
     { upsert: true },
   );
 
-  return accessToken;
+
+  const user = await UserDb.findById<User>(existingUserAuth.user);
+  await existingUserVer.deleteOne();
+  return {
+    token: accessToken,
+    user: user!,
+  };
 }
 
-export async function googleAuth(body: { email: string; googleToken: string; deviceId: string }): Promise<string> {
+export async function googleAuth(body: { email: string; googleToken: string; deviceId: string }): Promise<SignUpResponse> {
   const { googleToken, deviceId } = body;
   /**pull it off separately, so I can change it to lowercase */
   const email = body.email.toLowerCase();
@@ -249,12 +261,15 @@ export async function googleAuth(body: { email: string; googleToken: string; dev
       type: JwtType.USER,
       userId: existingUserAuth.user,
     });
-    return accessToken;
+    return {
+      token: accessToken,
+      user: (await UserDb.findById<User>(existingUserAuth.user))!,
+    };
   }
 
   // If user is not signed up, sign them up.
   const { email: googleEmail, name, picture } = await verifyGoogleToken(googleToken);
-  if (email.toLowerCase() !== googleEmail?.toUpperCase()) {
+  if (email.toLowerCase() !== googleEmail?.toLowerCase()) {
     throw new BadRequestError('Email does not match Google account');
   }
   // Create the user.
@@ -288,5 +303,8 @@ export async function googleAuth(body: { email: string; googleToken: string; dev
     deviceId,
   });
 
-  return accessToken;
+  return {
+    token: accessToken,
+    user: newUser as unknown as User,
+  };
 }

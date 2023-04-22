@@ -65,8 +65,8 @@ export async function handleLoginToAccount(req: IExpressRequest, res: ExpressRes
   const deviceId = req.headers['x-device-id'];
   const { email, password } = req.body;
   try {
-    const response = await authService.handleLogin({ email, password, deviceId: <string>deviceId });
-    ResponseManager.success(res, { response });
+    const response = await authService.login({ email, password, deviceId: <string>deviceId });
+    ResponseManager.success(res, response);
   } catch (err: any) {
     ResponseManager.handleError(res, err);
   }
@@ -76,13 +76,13 @@ export async function handleLoginToAccountOtp(req: IExpressRequest, res: Express
   const deviceId = req.headers['x-device-id'];
   const { email, otp, trustDevice } = req.body;
   try {
-    const response = await authService.handleVerifyLoginDeviceOtp({
+    const response = await authService.verifyLoginDeviceOtp({
       otp,
       email,
       deviceId: <string>deviceId,
       trustDevice
     });
-    ResponseManager.success(res, { response });
+    ResponseManager.success(res, response);
   } catch (err: any) {
     ResponseManager.handleError(res, err);
   }
@@ -97,7 +97,7 @@ export async function handleGoogleAuth(req: Request, res: ExpressResponse): Prom
       deviceId: <string>deviceId,
       googleToken
     });
-    ResponseManager.success(res, { response });
+    ResponseManager.success(res, response);
   } catch (err: any) {
     ResponseManager.handleError(res, err);
   }

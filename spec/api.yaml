@@ -75,7 +75,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TokenResponse'
+                $ref: '#/components/schemas/LoginResponse'
         400:
           description: "Device verification failed"
           content:
@@ -189,8 +189,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/User'
-
-  /user/profile:
     put:
       summary: 'edit user details'
       tags:
@@ -221,7 +219,6 @@ paths:
                     type: string
                 example:
                   { "message": "User not found" }
-
 
 components:
   parameters:
@@ -292,11 +289,10 @@ components:
         otp:
           type: string
         trustDevice:
-          type: string
+          type: boolean
       required:
         - email
         - otp
-
 
     TokenResponse:
       type: object
@@ -381,3 +377,11 @@ components:
           type: string
         googleToken:
           type: string
+
+    LoginResponse:
+      type: object
+      properties:
+        token:
+          type: string
+        user:
+          $ref: '#/components/schemas/User'
