@@ -1,6 +1,6 @@
 import { SignupOtpRequest, SignupOtpVerifyRequest, SignUpTokenRequest } from '../interfaces/auth.requests';
 import { AuthType, UserAuthDb, UserDb, UserTokenDb, UserVerificationDb } from '../models';
-import { BadRequestError } from '../interfaces';
+import { BadRequestError, User } from '../interfaces';
 import { generateOtp } from '../helpers/Utils';
 /** I don't want to bloat everywhere with import from the same folder*/
 // import { UserVerificationDb } from '../models/user.verification';
@@ -9,6 +9,7 @@ import { JwtHelper } from '../helpers/jwt.helper';
 import { verifyGoogleToken } from '../helpers/google.helper';
 import { config } from '../constants/settings';
 import { redisClient } from '../helpers/redis.connector';
+import { SignUpResponse } from '../interfaces/auth.responses';
 
 const jwtHelper = new JwtHelper({
   privateKey: config.jwtPrivateKey,
@@ -83,9 +84,9 @@ export async function verifySignupOtp(body: SignupOtpVerifyRequest): Promise<str
   return token;
 }
 
-export async function handleSingnupWithToken(body: SignUpTokenRequest): Promise<object> {
-  const { fullName, password, email, deviceId } = body;
-
+export async function signUpWithToken(body: SignUpTokenRequest): Promise<SignUpResponse> {
+  const { fullName, password, deviceId } = body;
+  let email = body.email.toLowerCase();
   const user = new UserDb({
     email,
     fullName,
@@ -100,9 +101,27 @@ export async function handleSingnupWithToken(body: SignUpTokenRequest): Promise<
     user: newUser._id,
   });
 
-  await userAuth.save()
+  await userAuth.save();
 
-  return newUser
+  const accessToken = jwtHelper.generateToken({
+    email,
+    deviceId,
+    type: JwtType.USER,
+    userId: newUser._id,
+  });
+
+  /**for first time login -> upsert-true*/
+  const dbSaveRes = await UserTokenDb.create({
+    email,
+    token: accessToken,
+    user: newUser._id,
+    deviceId,
+  });
+
+  return {
+    token: dbSaveRes.token,
+    user: newUser as unknown as User,
+  }
 }
 
 export async function handleLogin(body: { email: string; password: string; deviceId: string }): Promise<string> {

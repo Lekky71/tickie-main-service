@@ -32,12 +32,13 @@ export class JwtHelper {
   }
 
   generateToken(body: GenerateTokenParam): string {
+    const encryptionKey = Buffer.from(this.configOption.privateKey, 'base64').toString();
     if (body.type === JwtType.NEW_USER) {
       return jwt.sign({
         email: body.email,
         deviceId: body.deviceId,
         type: JwtType.NEW_USER
-      }, this.configOption.privateKey, { expiresIn: 60 * 60 });
+      }, encryptionKey, { expiresIn: 60 * 60 });
     }
 
     if (body.type === JwtType.USER) {
@@ -46,16 +47,17 @@ export class JwtHelper {
         userId: body.userId,
         deviceId: body.email,
         type: JwtType.USER
-      }, this.configOption.privateKey, { expiresIn: '1W' });
+      }, encryptionKey, { expiresIn: '1W' });
     }
     throw new Error('type not supported yet');
   }
 
   async verifyToken(token: string): Promise<GenerateTokenParam> {
     try {
-      const result = await jwt.verify(token, Buffer.from(this.configOption.privateKey, 'base64'));
+      const result = await jwt.verify(token, Buffer.from(this.configOption.privateKey, 'base64').toString());
       return result as GenerateTokenParam;
     } catch (error) {
+      console.error(error);
       throw {
         code: 403,
         data: error
@@ -75,17 +77,20 @@ export class JwtHelper {
         }
         // Check if token is valid
         // Check cache first
-        const cacheKey = `tickie_token:${token}`;
-        const cachedToken = await this.configOption.redisClient.get(cacheKey);
-        if (!cachedToken) {
-          const dbToken = await this.UserTokenDb.findOne({ token });
-          if (!dbToken) {
-            return this.respondError(res, 403, 'Invalid token');
-          } else {
-            await this.configOption.redisClient.set(cacheKey, JSON.stringify(dbToken));
-            await this.configOption.redisClient.expire(cacheKey, 60 * 60 * 24 * 7);
+        if (roleType === JwtType.USER) {
+          const cacheKey = `tickie_token:${token}`;
+          const cachedToken = await this.configOption.redisClient.get(cacheKey);
+          if (!cachedToken) {
+            const dbToken = await this.UserTokenDb.findOne({ token });
+            if (!dbToken) {
+              return this.respondError(res, 403, 'Invalid token');
+            } else {
+              await this.configOption.redisClient.set(cacheKey, JSON.stringify(dbToken));
+              await this.configOption.redisClient.expire(cacheKey, 60 * 60 * 24 * 7); // 7 days
+            }
           }
         }
+
         const decoded = await this.verifyToken(token);
         if (roleType !== decoded.type) {
           return this.respondError(res, 403, 'Invalid token');
