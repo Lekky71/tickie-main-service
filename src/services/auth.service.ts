@@ -124,7 +124,12 @@ export async function handleLogin(body: { email: string, password: string, devic
   return accessToken;
 }
 
-export async function handleVerifyLoginDeviceOtp(body: { otp: string, email: string, deviceId: string, trustDevice: boolean }): Promise<string> {
+export async function handleVerifyLoginDeviceOtp(body: {
+  otp: string,
+  email: string,
+  deviceId: string,
+  trustDevice: boolean
+}): Promise<string> {
   const { otp, email, deviceId, trustDevice } = body;
 
   /** find userVerification with the provided email
