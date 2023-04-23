@@ -1,6 +1,5 @@
-import { Schema } from 'mongoose';
-import * as crypto from 'crypto';
 import * as mongoose from 'mongoose';
+import { Schema } from 'mongoose';
 import { config } from '../constants/settings';
 import { OtpType } from '../interfaces/user.verification';
 import { v4 as uuidv4 } from 'uuid';
@@ -27,8 +26,8 @@ const UserVerificationSchema = new Schema({
   },
   type: {
     type: String, // one of sign-up, login, forgot-password
-    enum: Object.keys(OtpType),
-    required: true,
+    enum: Object.values(OtpType),
+    required: true
   },
   expiresAt: {
     type: Date,
@@ -37,14 +36,14 @@ const UserVerificationSchema = new Schema({
   },
 }, {
   toObject: {
-    transform(doc, ret, _options) {
+    transform(doc, ret) {
       ret.id = ret._id;
       delete ret._id;
       return ret;
     },
   },
   toJSON: {
-    transform(doc, ret, _options) {
+    transform(doc, ret) {
       ret.id = ret._id;
       delete ret._id;
       return ret;

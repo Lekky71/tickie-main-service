@@ -1,9 +1,9 @@
-import * as fs from 'fs';
+import fs from 'fs';
 import * as OpenApiValidator from 'express-openapi-validator';
 
 const specPath = './spec/api.yaml';
 
-if (!fs.existsSync(specPath)) {
+if (!fs.existsSync('./spec/api.yaml')) {
   throw new Error('API spec path is not valid');
 }
 

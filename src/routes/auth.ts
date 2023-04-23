@@ -1,13 +1,39 @@
 import express from 'express';
-import {handleSignUpOtpRequest, handleVerifySignupOtp, handleLoginToAccount, handleLoginToAccountOtp} from '../controlllers';
+import {
+  handleGoogleAuth,
+  handleLoginToAccount,
+  handleLoginToAccountOtp,
+  handleSignUpOtpRequest,
+  handleSignupWithToken,
+  handleVerifySignupOtp
+} from '../controlllers';
+import { JwtHelper } from '../helpers/jwt.helper';
+import { config } from '../constants/settings';
+import { UserTokenDb } from '../models';
+import { redisClient } from '../helpers/redis.connector';
+import { JwtType } from '../interfaces/user.verification';
 
 
 const router = express.Router();
 
+const jwtHelper = new JwtHelper({
+  privateKey: config.jwtPrivateKey,
+  UserTokenDb,
+  redisClient: redisClient,
+});
+
 router.post('/otp-request', handleSignUpOtpRequest);
 router.post('/otp-verify/signup', handleVerifySignupOtp);
 
-router.post('/login',handleLoginToAccount )
-router.post('/otp-verify/login', handleLoginToAccountOtp)
+router.post('/login', handleLoginToAccount);
+
+router.post('/signup',
+  jwtHelper.requirePermission(JwtType.NEW_USER),
+  handleSignupWithToken,
+);
+
+router.post('/otp-verify/login', handleLoginToAccountOtp);
+
+router.post('/google-auth', handleGoogleAuth);
 
 export default router;
