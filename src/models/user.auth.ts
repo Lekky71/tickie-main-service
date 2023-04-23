@@ -15,8 +15,9 @@ interface IUserAuthDocument {
   type: AuthType,
 }
 
-interface IUserAuth extends IUserAuthDocument {
+export interface IUserAuth extends IUserAuthDocument {
   verifyPassword(arg: string): boolean;
+  save(args:object):void
 }
 
 interface IUserAuthModel extends Model<IUserAuth> {

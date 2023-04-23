@@ -5,7 +5,7 @@ import { UserTokenDb } from '../models';
 import { redisClient } from '../helpers/redis.connector';
 import authRoutes from './auth';
 import { JwtType } from '../interfaces/user.verification';
-import { handleGetMyProfile } from '../controlllers/user.controller';
+import { handleGetMyProfile, handleManagePassword } from '../controlllers/user.controller';
 
 const router = express.Router();
 
@@ -18,5 +18,7 @@ const jwtHelper = new JwtHelper({
 router.use('/auth', authRoutes);
 
 router.get('/me', jwtHelper.requirePermission(JwtType.USER), handleGetMyProfile);
+
+router.put('/change-password',jwtHelper.requirePermission(JwtType.USER), handleManagePassword )
 
 export default router;
