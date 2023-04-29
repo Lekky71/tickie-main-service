@@ -26,3 +26,9 @@ export interface ForgotPasswordOtpRequest {
   email: string;
   deviceId:string;
 }
+
+export interface ResetPasswordRequest{
+  email:any;
+  deviceId:string;
+  password:string;
+}

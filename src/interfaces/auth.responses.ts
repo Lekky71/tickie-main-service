@@ -5,6 +5,10 @@ export interface SignUpResponse {
   user: User;
 }
 
+export interface ResetPasswordResponse{
+  token: string;
+}
+
 export interface LoginResponse {
   token: string;
   user: User;
