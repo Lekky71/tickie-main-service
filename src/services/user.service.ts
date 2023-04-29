@@ -13,8 +13,9 @@ export async function getMyProfile(userId: string): Promise<User> {
 export async function managePassword(
   props: { userId: string, currentPassword: string, newPassword: string }): Promise<User> {
   const userAuth = await UserAuthDb.findOne<IUserAuth>({ user: props.userId });
-  if (!userAuth)
+  if (!userAuth) {
     throw new BadRequestError('there is an error with your login information');
+  }
 
   /**
    * check if there is a user
@@ -25,17 +26,18 @@ export async function managePassword(
    * return user
    * */
 
-  if (!userAuth.verifyPassword(props.currentPassword))
-    throw new BadRequestError('current password is wrong')
+  if (!userAuth.verifyPassword(props.currentPassword)) {
+    throw new BadRequestError('current password is wrong');
+  }
 
-  userAuth.password = props.newPassword
+  userAuth.password = props.newPassword;
   /** validateModifiedOnly option to true for the plugin to run*/
-  await userAuth.save({ validateModifiedOnly: true })
+  await userAuth.save({ validateModifiedOnly: true });
 
-  await UserTokenDb.deleteOne({ user: props.userId })
+  await UserTokenDb.deleteOne({ user: props.userId });
 
   const user = await UserDb.findById<User>(props.userId);
 
-  return user!
+  return user!;
 
 }

@@ -401,6 +401,8 @@ components:
           type: string
         newPassword:
           type: string
+          format: password
+          pattern: '^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$'
 
     LoginRequest:
       type: object

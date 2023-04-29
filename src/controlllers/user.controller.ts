@@ -13,15 +13,15 @@ export async function handleGetMyProfile(req: IExpressRequest, res: ExpressRespo
   }
 }
 
-export async function handleManagePassword(req: IExpressRequest, res: ExpressResponse): Promise<void> {
+export async function handleChangePassword(req: IExpressRequest, res: ExpressResponse): Promise<void> {
   try {
     const body = {
       userId: <string>req.userId,
       currentPassword: req.body.currentPassword,
       newPassword: req.body.newPassword
     };
-    const response = await userService.managePassword(body)
-    ResponseManager.success(res, response)
+    const response = await userService.managePassword(body);
+    ResponseManager.success(res, response);
   } catch (err: unknown) {
     ResponseManager.handleError(res, err);
   }
