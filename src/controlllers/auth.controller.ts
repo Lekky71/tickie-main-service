@@ -41,8 +41,8 @@ export async function handleVerifySignupOtp(req: IExpressRequest, res: ExpressRe
 }
 
 export async function handleSignupWithToken(req: IExpressRequest, res: ExpressResponse): Promise<void> {
-  const { fullName, password } = req.body
-  const email = req.email
+  const { fullName, password } = req.body;
+  const email = req.email;
   const deviceId = req.headers['x-device-id'];
   try {
     const result = await authService.signUpWithToken({
@@ -100,5 +100,35 @@ export async function handleGoogleAuth(req: Request, res: ExpressResponse): Prom
     ResponseManager.success(res, response);
   } catch (err: any) {
     ResponseManager.handleError(res, err);
+  }
+}
+
+export async function handleForgotPasswordOtpRequest(req:Request,res:ExpressResponse): Promise<void>{
+  const {email} = req.body;
+  const deviceId = req.headers['x-device-id'];
+
+  try{
+
+   await authService.sendForgotPasswordOtp({
+      email,
+      deviceId: <string>deviceId
+    });
+
+    ResponseManager.success(res,{message:'Otp successfully sent'});
+
+  }catch(err:any){
+    ResponseManager.handleError(res,err);
+  }
+
+}
+
+
+export async function verifyPasswordOtpRequest(req:Request,res:ExpressResponse): Promise <void>{
+  try{
+
+    const {email,otp} = req.body;
+
+  }catch( err:any){
+    ResponseManager.handleError(res,err);
   }
 }

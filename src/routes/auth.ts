@@ -5,7 +5,8 @@ import {
   handleLoginToAccountOtp,
   handleSignUpOtpRequest,
   handleSignupWithToken,
-  handleVerifySignupOtp
+  handleVerifySignupOtp,
+  handleForgotPasswordOtpRequest,
 } from '../controlllers';
 import { JwtHelper } from '../helpers/jwt.helper';
 import { config } from '../constants/settings';
@@ -35,5 +36,6 @@ router.post('/signup',
 router.post('/otp-verify/login', handleLoginToAccountOtp);
 
 router.post('/google-auth', handleGoogleAuth);
+router.post('/forgotpassword/otp-request',handleForgotPasswordOtpRequest);
 
 export default router;

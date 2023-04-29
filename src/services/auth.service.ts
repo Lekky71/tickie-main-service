@@ -1,4 +1,4 @@
-import { SignupOtpRequest, SignupOtpVerifyRequest, SignUpTokenRequest } from '../interfaces/auth.requests';
+import { SignupOtpRequest, SignupOtpVerifyRequest, SignUpTokenRequest, ForgotPasswordOtpRequest } from '../interfaces/auth.requests';
 import { AuthType, UserAuthDb, UserDb, UserTokenDb, UserVerificationDb } from '../models';
 import { BadRequestError, User } from '../interfaces';
 import { generateOtp } from '../helpers/Utils';
@@ -117,7 +117,7 @@ export async function signUpWithToken(body: SignUpTokenRequest): Promise<SignUpR
   return {
     token: dbSaveRes.token,
     user: newUser as unknown as User,
-  }
+  };
 }
 
 export async function login(body: { email: string; password: string; deviceId: string }): Promise<LoginResponse> {
@@ -307,4 +307,48 @@ export async function googleAuth(body: { email: string; googleToken: string; dev
     token: accessToken,
     user: newUser as unknown as User,
   };
+}
+
+
+// endpoints for forgotPassword 
+
+export async function sendForgotPasswordOtp(body:ForgotPasswordOtpRequest): Promise<void>{
+  let {email} = body;
+  const deviceId = body;
+  email = email.toLowerCase();
+
+  const existingAuth = await UserDb.findOne({email});
+  if(!existingAuth){
+    throw new BadRequestError('user with this email does not exist');
+  }
+
+  // generate otp
+  const otp = generateOtp();
+
+  const existingVerification = await UserVerificationDb.findOne({
+    email,
+    deviceId,
+    createdAt: { $gte: Date.now() - 60000 },
+  });
+
+  if (existingVerification) {
+    throw new BadRequestError('OTP has been sent within the minute.');
+  }
+
+  const newVer = new UserVerificationDb({
+    email,
+    otp,
+    deviceId,
+    type: OtpType.FORGOT_PASSWORD
+
+  });
+
+  await newVer.save();
+
+  
+
+
+    // send an email containing the otp
+
+
 }

@@ -15,3 +15,8 @@ export interface SignUpTokenRequest{
   email:any;
   deviceId:string;
 }
+
+export interface ForgotPasswordOtpRequest {
+  email: string;
+  deviceId:string;
+}
