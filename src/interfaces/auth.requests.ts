@@ -9,6 +9,12 @@ export interface SignupOtpVerifyRequest {
   otp: string;
 }
 
+export interface ForgotPasswordOtpVerifyRequest{
+  email: string;
+  deviceId: string;
+  otp: string;
+}
+
 export interface SignUpTokenRequest{
   fullName:string;
   password:string;
