@@ -131,7 +131,7 @@ export async function handleVerifyForgotPasswordOtpRequest(req: Request, res: Ex
 }
 
 export async function handleResetPassword(req: IExpressRequest, res: ExpressResponse): Promise<void> {
-  const email = req.email;
+  const email = req.email!;
   const deviceId = req.headers['x-device-id'];
   const { password } = req.body;
 
