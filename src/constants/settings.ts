@@ -14,5 +14,11 @@ export const config = {
   },
   redis: {
     uri: <string>process.env.REDIS_URI
+  },
+  aws: {
+    secretAccessKey: <string>process.env.AWS_SECRET_KEY,
+    accessKeyId: <string>process.env.AWS_ACCESS_KEY_ID,
+    region: <string>process.env.AWS_REGION,
+    s3BucketName: <string>process.env.AWS_S3_BUCKET,
   }
 };
