@@ -7,10 +7,9 @@ import compression from 'compression';
 import helmet from 'helmet';
 import methodOverride from 'method-override';
 import * as swaggerUi from 'swagger-ui-express';
+import ApiRoutes from './routes';
 
 const swaggerSpec = require('./configuration/swagger');
-
-import ApiRoutes from './routes';
 
 const isProduction: boolean = process.env.NODE_ENV === 'production';
 
@@ -32,8 +31,8 @@ app.use(
       }
       // fallback to standard filter function
       return compression.filter(req, res);
-    },
-  }),
+    }
+  })
 );
 
 /**
@@ -69,8 +68,11 @@ app.use((err: any, req: Request, res: Response, next: NextFunction) => {
   // format error
   return res.status(err.status || 500).json({
     message: err.message,
-    errors: err.errors,
+    errors: err.errors
   });
 });
 
 export default app;
+
+
+

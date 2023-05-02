@@ -14,7 +14,7 @@ import { LoginResponse, SignUpResponse } from '../interfaces/auth.responses';
 const jwtHelper = new JwtHelper({
   privateKey: config.jwtPrivateKey,
   UserTokenDb,
-  redisClient: redisClient,
+  redisClient: redisClient
 });
 
 export async function sendSignUoOtp(body: SignupOtpRequest): Promise<void> {
@@ -33,7 +33,7 @@ export async function sendSignUoOtp(body: SignupOtpRequest): Promise<void> {
   const existingVerification = await UserVerificationDb.findOne({
     email,
     deviceId,
-    createdAt: { $gte: Date.now() - 60000 },
+    createdAt: { $gte: Date.now() - 60000 }
   });
 
   if (existingVerification) {
@@ -47,7 +47,7 @@ export async function sendSignUoOtp(body: SignupOtpRequest): Promise<void> {
     otp,
     deviceId,
     type: OtpType.SIGN_UP,
-    expiresAt: new Date(Date.now() + 10 * 60 * 1000),
+    expiresAt: new Date(Date.now() + 10 * 60 * 1000)
   });
   // Save the record
   await newVer.save();
@@ -61,7 +61,7 @@ export async function verifySignupOtp(body: SignupOtpVerifyRequest): Promise<str
   const verification = await UserVerificationDb.findOne<UserVerification>({
     email,
     deviceId,
-    otp,
+    otp
   });
   if (!verification) {
     throw new BadRequestError('Invalid OTP');
@@ -72,7 +72,7 @@ export async function verifySignupOtp(body: SignupOtpVerifyRequest): Promise<str
   const token = jwtHelper.generateToken({
     email,
     deviceId,
-    type: JwtType.NEW_USER,
+    type: JwtType.NEW_USER
   });
 
   // delete used record
@@ -85,7 +85,7 @@ export async function signUpWithToken(body: SignUpTokenRequest): Promise<SignUpR
   let email = body.email.toLowerCase();
   const user = new UserDb({
     email,
-    fullName,
+    fullName
   });
 
   const newUser = await user.save();
@@ -94,7 +94,7 @@ export async function signUpWithToken(body: SignUpTokenRequest): Promise<SignUpR
     email,
     password,
     recognisedDevices: deviceId,
-    user: newUser._id,
+    user: newUser._id
   });
 
   await userAuth.save();
@@ -103,7 +103,7 @@ export async function signUpWithToken(body: SignUpTokenRequest): Promise<SignUpR
     email,
     deviceId,
     type: JwtType.USER,
-    userId: newUser._id,
+    userId: newUser._id
   });
 
   /**for first time login -> upsert-true*/
@@ -111,13 +111,13 @@ export async function signUpWithToken(body: SignUpTokenRequest): Promise<SignUpR
     email,
     token: accessToken,
     user: newUser._id,
-    deviceId,
+    deviceId
   });
 
   return {
     token: dbSaveRes.token,
-    user: newUser as unknown as User,
-  }
+    user: newUser as unknown as User
+  };
 }
 
 export async function login(body: { email: string; password: string; deviceId: string }): Promise<LoginResponse> {
@@ -142,9 +142,9 @@ export async function login(body: { email: string; password: string; deviceId: s
         deviceId,
         type: OtpType.LOGIN,
         expiresAt: new Date(Date.now() + 10 * 60 * 1000),
-        user: existingUserAuth.user,
+        user: existingUserAuth.user
       },
-      { upsert: true },
+      { upsert: true }
     );
 
     // send email function goes here
@@ -159,7 +159,7 @@ export async function login(body: { email: string; password: string; deviceId: s
     email,
     deviceId,
     type: JwtType.USER,
-    userId: existingUserAuth.user,
+    userId: existingUserAuth.user
   });
 
   /**for first time login -> upsert-true*/
@@ -180,6 +180,7 @@ export async function login(body: { email: string; password: string; deviceId: s
     user: user!,
   };
 }
+
 
 export async function verifyLoginDeviceOtp(body: {
   otp: string;
@@ -238,7 +239,11 @@ export async function verifyLoginDeviceOtp(body: {
   };
 }
 
-export async function googleAuth(body: { email: string; googleToken: string; deviceId: string }): Promise<SignUpResponse> {
+export async function googleAuth(body: {
+  email: string;
+  googleToken: string;
+  deviceId: string
+}): Promise<SignUpResponse> {
   const { googleToken, deviceId } = body;
   /**pull it off separately, so I can change it to lowercase */
   const email = body.email.toLowerCase();
