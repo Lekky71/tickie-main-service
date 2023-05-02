@@ -1,13 +1,13 @@
 require("dotenv").config();
 
-import bodyParser from "body-parser";
-import cookieParser from "cookie-parser";
-import express, { NextFunction, Request, Response } from "express";
-import compression from "compression";
-import helmet from "helmet";
-import methodOverride from "method-override";
-import * as swaggerUi from "swagger-ui-express";
-import ApiRoutes from "./routes";
+import bodyParser from 'body-parser';
+import cookieParser from 'cookie-parser';
+import express, { NextFunction, Request, Response } from 'express';
+import compression from 'compression';
+import helmet from 'helmet';
+import methodOverride from 'method-override';
+import * as swaggerUi from 'swagger-ui-express';
+import ApiRoutes from './routes';
 
 const swaggerSpec = require("./configuration/swagger");
 
