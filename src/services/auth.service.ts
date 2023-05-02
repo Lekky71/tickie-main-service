@@ -123,7 +123,7 @@ export async function signUpWithToken(body: SignUpTokenRequest): Promise<SignUpR
 
   return {
     token: dbSaveRes.token,
-    user: newUser as unknown as User,
+    user: newUser as unknown as User
   };
 }
 
