@@ -71,7 +71,7 @@ const resizeAndUploadImageForAllSizes = async (file: MulterS3File) => {
   // upload to s3
   // return the s3 urls for these files
 
-}
+};
 
 export const multerUpload = multer({
   fileFilter,
@@ -91,8 +91,7 @@ export const multerUpload = multer({
   }),
 });
 
-
-async function fileToBuffer(url: string): Promise<Buffer> {
+const fileToBuffer = async (url: string): Promise<Buffer> => {
   const response = await axios.get(url, { responseType: 'arraybuffer' });
   return Buffer.from(response.data, 'utf-8');
 }

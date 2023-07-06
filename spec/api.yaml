@@ -223,6 +223,39 @@ paths:
                 example:
                   { "message": "User not found" }
 
+  /user/change-password:
+    put:
+      summary: 'Change user Password'
+      tags:
+        - user
+      parameters:
+        - $ref: '#/components/parameters/AuthToken'
+      operationId: Change User Password
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChangeUserPassword'
+      responses:
+        200:
+          description: 'Success'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        404:
+          description: 'Error'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                example:
+                  { "message": "Your current password is wrong, you've two tries left" }
+
+
 components:
   parameters:
     UserID:
@@ -390,3 +423,17 @@ components:
           type: string
         user:
           $ref: '#/components/schemas/User'
+
+    ChangeUserPassword:
+      type: object
+      required:
+        - currentPassword
+        - newPassword
+      properties:
+        currentPassword:
+          type: string
+        newPassword:
+          type: string
+          format: password
+          pattern: '^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$'
+
