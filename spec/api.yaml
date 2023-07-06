@@ -198,7 +198,10 @@ paths:
       operationId: EditUserProfile
       requestBody:
         content:
-          application/json:
+          multipart/form-data: # Media type
+            encoding:
+              avatar:
+                contentType: image/png, image/jpeg, image/heic, image/heif
             schema:
               $ref: '#/components/schemas/EditUserInfoRequest'
       responses:
@@ -353,11 +356,13 @@ components:
 
     EditUserInfoRequest:
       type: object
-      required:
-        - fullName
       properties:
         fullName:
           type: string
+        avatar:
+          type: string
+          format: binary
+
     LoginRequest:
       type: object
       required:
