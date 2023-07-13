@@ -7,7 +7,14 @@ export const config = {
       users: 'users',
       userAuthTokens: 'user_auth_tokens',
       userAuth: 'user_auths',
-      assets: 'assets'
+      assets: 'assets',
+      events: 'events',
+      tickets: 'tickets',
+      purchased_tickets: 'purchased_tickets',
+      transactions: 'transactions',
+      ledgers: 'ledgers',
+
+
     }
   },
   google: {
