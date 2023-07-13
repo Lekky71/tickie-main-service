@@ -22,11 +22,6 @@ const AssetSchema = new Schema({
     ref: config.mongodb.collections.users,
     required: true,
   },
-  depositActivity: {
-    type: String,
-    enum: Object.values(ActivityStatus),
-    default: ActivityStatus.ACTIVE,
-  },
   withdrawalActivity: {
     type: String,
     enum: Object.values(ActivityStatus),
