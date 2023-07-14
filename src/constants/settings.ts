@@ -6,7 +6,15 @@ export const config = {
       userVerifications: 'user_verifications',
       users: 'users',
       userAuthTokens: 'user_auth_tokens',
-      userAuth: 'user_auths'
+      userAuth: 'user_auths',
+      assets: 'assets',
+      events: 'events',
+      tickets: 'tickets',
+      purchased_tickets: 'purchased_tickets',
+      transactions: 'transactions',
+      ledgers: 'ledgers',
+
+
     }
   },
   google: {
@@ -14,5 +22,11 @@ export const config = {
   },
   redis: {
     uri: <string>process.env.REDIS_URI
+  },
+  aws: {
+    secretAccessKey: <string>process.env.AWS_SECRET_KEY,
+    accessKeyId: <string>process.env.AWS_ACCESS_KEY_ID,
+    region: <string>process.env.AWS_REGION,
+    s3BucketName: <string>process.env.AWS_S3_BUCKET,
   }
 };

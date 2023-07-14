@@ -32,3 +32,4 @@ export interface ResetPasswordRequest{
   deviceId:string;
   password:string;
 }
+
