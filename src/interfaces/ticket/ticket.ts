@@ -28,3 +28,7 @@ export interface TicketRequest{
   available:number;
 
 }
+
+export interface UpdateTicketRequest extends TicketRequest{
+  ticket: string;
+}
