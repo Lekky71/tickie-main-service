@@ -256,6 +256,72 @@ paths:
                   { "message": "Your current password is wrong, you've two tries left" }
 
 
+ # API specs for endpoints related to ticket
+  /admin/ticket/create-ticket:
+    post:
+      summary: 'Ticket: create Ticket'
+      tags:
+        - Ticket
+      operationId: CreateTicket
+      parameters:
+        - $ref: '#/components/parameters/AuthToken'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TicketRequest'
+        required: true
+      responses:
+        201:
+          description: 'Success'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DefaultResponse'
+        400:
+          description: "Error"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+
+  /admin/ticket/edit-ticket/:ticketId:
+    put:
+      summary: 'Ticket: update Ticket'
+      tags:
+        - Ticket
+      operationId: UpdateTicket
+      parameters:
+        - $ref: '#/components/parameters/AuthToken'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TicketRequest'
+        required: true
+      responses:
+        200:
+          description: 'Success'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DefaultResponse'
+        400:
+          description: "Error"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+
+
+
+
 components:
   parameters:
     UserID:
@@ -436,4 +502,64 @@ components:
           type: string
           format: password
           pattern: '^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$'
+
+    #Ticket related schemas
+
+    TicketRequest:
+      type: object
+      required:
+        - name
+        - event
+        - description
+        - price
+        - type
+        - total
+        - available
+      properties:
+        name:
+          type: string
+        event:
+          type: string
+        description:
+          type: string
+        price:
+          type: string
+        type:
+          type: string
+        total:
+          type: string
+        available:
+          type:string
+
+
+
+
+    Ticket:
+      type: object
+      required:
+        - id
+        - name
+        - event
+        - description
+        - price
+        - type
+        - total
+        - available
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        event:
+          type: string
+        description:
+          type: string
+        price:
+          type: string
+        type:
+          type: string
+        total:
+          type: string
+        available:
+          type:string
 
