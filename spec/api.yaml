@@ -257,7 +257,7 @@ paths:
 
 
  # API specs for endpoints related to ticket
-  /admin/ticket/create-ticket:
+  /ticket/create-ticket:
     post:
       summary: 'Ticket: create Ticket'
       tags:
@@ -555,11 +555,11 @@ components:
         description:
           type: string
         price:
-          type: string
+          type: number
         type:
           type: string
         total:
-          type: string
+          type: number
         available:
-          type:string
+          type: number
 

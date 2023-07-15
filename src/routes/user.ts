@@ -4,6 +4,7 @@ import { config } from '../constants/settings';
 import { UserTokenDb } from '../models';
 import { redisClient } from '../helpers/redis.connector';
 import authRoutes from './auth';
+import ticketRoutes from './ticket'
 import { JwtType } from '../interfaces/user.verification';
 import { handleChangePassword, handleGetMyProfile } from '../controlllers/user.controller';
 import { multerUpload } from '../helpers/inage.uploader';
@@ -17,6 +18,8 @@ const jwtHelper = new JwtHelper({
 });
 
 router.use('/auth', authRoutes);
+
+router.use('/ticket',ticketRoutes)
 
 router.get('/me', jwtHelper.requirePermission(JwtType.USER), handleGetMyProfile);
 
