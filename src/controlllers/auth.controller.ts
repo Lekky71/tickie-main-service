@@ -41,8 +41,8 @@ export async function handleVerifySignupOtp(req: IExpressRequest, res: ExpressRe
 }
 
 export async function handleSignupWithToken(req: IExpressRequest, res: ExpressResponse): Promise<void> {
-  const { fullName, password } = req.body
-  const email = req.email
+  const { fullName, password } = req.body;
+  const email = req.email;
   const deviceId = req.headers['x-device-id'];
   try {
     const result = await authService.signUpWithToken({

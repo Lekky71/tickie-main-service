@@ -1,5 +1,6 @@
 import { BadRequestError, NotFoundError, User } from '../interfaces';
 import { IUserAuth, UserAuthDb, UserDb, UserTokenDb } from '../models';
+import { MulterS3File } from '../interfaces/multer.s3.file';
 
 export async function getMyProfile(userId: string): Promise<User> {
   const user = await UserDb.findById<User>(userId);
@@ -9,6 +10,17 @@ export async function getMyProfile(userId: string): Promise<User> {
   return user;
 }
 
+export async function updateUserProfile(body: { userId: string; fullName?: string; avatarFile?: MulterS3File }): Promise<User> {
+  const { userId, avatarFile } = body;
+  const user = await UserDb.findById<User>(userId);
+  if (!user) {
+    throw new NotFoundError('User not found');
+  }
+  if (avatarFile) {
+
+  }
+  return user;
+}
 
 export async function managePassword(
   props: { userId: string, currentPassword: string, newPassword: string }): Promise<User> {
@@ -41,3 +53,4 @@ export async function managePassword(
   return user!;
 
 }
+
