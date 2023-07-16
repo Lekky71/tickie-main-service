@@ -58,4 +58,4 @@ const TicketSchema = new Schema({
 });
 
 /**same name with user verification, so I change it*/
-export const TicketDb = mongoose.model(config.mongodb.collections.purchased_tickets, TicketSchema);
+export const PurchasedTicket = mongoose.model(config.mongodb.collections.purchased_tickets, TicketSchema);
