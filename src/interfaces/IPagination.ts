@@ -3,4 +3,5 @@ export interface IPagination {
   size: number;
   totalCount: number;
   lastPage: number;
+  searchQuery: string
 }

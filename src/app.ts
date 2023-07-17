@@ -1,6 +1,7 @@
 require("dotenv").config();
 
 import bodyParser from 'body-parser';
+import morgan from 'morgan'
 import cookieParser from 'cookie-parser';
 import express, { NextFunction, Request, Response } from 'express';
 import compression from 'compression';
@@ -18,6 +19,7 @@ const app = express();
 app.set("port", process.env.APP_PORT);
 app.set("env", process.env.NODE_ENV);
 
+app.use(morgan('dev'))
 app.use(bodyParser.json());
 
 app.use(cookieParser());
@@ -54,7 +56,7 @@ router.use(ApiRoutes);
 app.use(router);
 
 // Force all requests on production to be served over https
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
   if (req.headers["x-forwarded-proto"] !== "https" && isProduction) {
     const secureUrl = "https://" + req.hostname + req.originalUrl;
     res.redirect(302, secureUrl);
@@ -65,8 +67,8 @@ app.use(function(req, res, next) {
 
 // eslint-disable-next-line no-unused-vars
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
-  // format error
-  return res.status(err.status || 500).json({
+  // handles all errors passed as argument to next() function
+  return res.status(err.code || 500).json({
     message: err.message,
     errors: err.errors
   });

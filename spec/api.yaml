@@ -255,6 +255,172 @@ paths:
                 example:
                   { "message": "Your current password is wrong, you've two tries left" }
 
+  /events:
+    get:
+      summary: 'Get events with query pagination, search query, and query size'
+      tags:
+        - Events
+      operationId: Get Events
+      responses:
+        200:
+          description: 'Success'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Event'
+        400:
+          description: 'Error'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                example:
+                  { "message": "Bad request, try again with the appropriate parameters" }
+    post:
+      summary: 'Create a new event'
+      description: 'Takes in { ?draft=true } query parameter to save an event as a draft, boolean {true} as the only value'
+      tags:
+        - Events
+      parameters:
+        - $ref: '#/components/parameters/AuthToken'
+      operationId: Post Events
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Event'
+      responses:
+        200:
+          description: 'Success'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Event'
+        400:
+          description: 'Error'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                example:
+                  { "message": "Bad request, try again." }
+
+  /events/{eventId}:
+    put:
+      summary: 'Edit Already existing events by the creator'
+      tags:
+        - Events
+      parameters:
+        - $ref: '#/components/parameters/AuthToken'
+        - $ref: '#/components/parameters/EventID'
+      operationId: Post Events
+
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Event'
+      responses:
+        200:
+          description: 'Success'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Event'
+        404:
+          description: 'Error'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                example:
+                  { "message": "No event found with the provided parameters" }
+    delete:
+      summary: 'Delete Already existing events by only the creator'
+      tags:
+        - Events
+      parameters:
+        - $ref: '#/components/parameters/AuthToken'
+        - $ref: '#/components/parameters/EventID'
+      operationId: Delete Events
+      responses:
+        200:
+          description: 'Success'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DefaultResponse'
+        404:
+          description: 'Error'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                example:
+                  { "message": "No event found with the provided parameters" }
+    get:
+      summary: 'Get Event'
+      tags:
+        - Events
+      parameters:
+        - $ref: '#/components/parameters/EventID'
+      operationId: Get Event
+      responses:
+        200:
+          description: 'Success'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Event'
+        404:
+          description: 'Error'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                example:
+                  { "message": "No event found with the provided parameters" }
+  /events/drafts:
+    get:
+      summary: 'Get Draft events by creator'
+      parameters:
+        - $ref: '#/components/parameters/AuthToken'
+      tags:
+        - Events
+      operationId: Get Draft Events
+      responses:
+        200:
+          description: 'Success'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Event'
+        400:
+          description: 'Error'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                example:
+                  { "message": "Bad request, try again with the appropriate parameters" }
 
 components:
   parameters:
@@ -264,6 +430,13 @@ components:
       schema:
         type: string
       required: true
+    EventID:
+      name: eventId
+      in: path
+      schema:
+        type: string
+      required: true
+      description: unique ID of the event to get
     AuthToken:
       name: x-auth-token
       in: header
@@ -436,4 +609,23 @@ components:
           type: string
           format: password
           pattern: '^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$'
+    Event:
+      type: object
+      required:
+        - name
+        - creator
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+          format: email
+        endDate:
+          type: string
+        creator:
+          type: string
+      example:
+        name: Myke's Event
+        creator: 827472882-28284772jwjuj2wej-23
+
 
