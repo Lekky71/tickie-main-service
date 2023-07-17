@@ -1,7 +1,13 @@
 import {TicketDb} from '../models/ticket';
 import {EventDb} from '../models/event';
 import {BadRequestError,NotFoundError} from '../interfaces';
-import {TicketRequest,Ticket,UpdateTicketRequest} from '../interfaces/ticket/ticket';
+import {
+  TicketRequest,
+  Ticket,
+  UpdateTicketRequest,
+  AllTicketsResponse,
+  AllTicketsRequest
+} from '../interfaces/ticket/ticket';
 
 export async function createTicket(body:TicketRequest):Promise<Ticket>{
 
@@ -55,5 +61,23 @@ export async function editTicketDetails(body:UpdateTicketRequest):Promise<Ticket
 
   const editedTicket = await TicketDb.findById(ticket)
   return editedTicket as unknown as Ticket
+
+}
+
+export async function getAllTickets(body:AllTicketsRequest):Promise<AllTicketsResponse>{
+
+  const {event,page,limit,filter} = body
+  const totalTickets = await TicketDb.find<Ticket>({event:event}).countDocuments()
+
+  const totalPages = Math.ceil(totalTickets/limit)
+
+  const allTickets = await TicketDb.find<Ticket>({event:event}).skip((page - 1) * limit).limit(limit)
+  const filteredTicket = await TicketDb.find<Ticket>({event: event,type:filter})
+
+ return{
+    allTickets:allTickets,
+    filteredTickets: filteredTicket,
+    totalPages:totalPages,
+ }
 
 }

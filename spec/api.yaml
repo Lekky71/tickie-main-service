@@ -319,6 +319,33 @@ paths:
                   error:
                     type: string
 
+    /events/:eventId/tickets/getAll?page=&limit=&filter=:
+      get:
+        summary: 'Get all tickets'
+        tags:
+          - Ticket
+        parameters:
+          - $ref: '#/components/parameters/AuthToken'
+        responses:
+          200:
+            description: 'Success'
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Ticket'
+          404:
+            description: 'No ticket found'
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    message:
+                      type: string
+                  example:
+                    {"message":"No tickets found"}
+
+
 
 
 

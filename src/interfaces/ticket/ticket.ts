@@ -2,12 +2,15 @@ import mongoose from 'mongoose';
 
 export interface Ticket extends mongoose.Document {
   id: string;
+  user:string
+  event:string
   name: string;
   description: string;
   price: number;
   type: string;
   total: number;
   available:number;
+  isDraft:boolean
 
 }
 
@@ -32,4 +35,19 @@ export interface TicketRequest{
 
 export interface UpdateTicketRequest extends TicketRequest{
   ticket: string;
+}
+
+
+export interface  AllTicketsResponse {
+  allTickets : Ticket[]
+  filteredTickets : Ticket[]
+  totalPages : number
+}
+
+export interface AllTicketsRequest{
+  event:string;
+  page:number;
+  limit:number;
+  filter:string;
+
 }
