@@ -27,4 +27,5 @@ router.put('/edit-ticket/:ticketId',jwtHelper.requirePermission(JwtType.USER),ha
 router.get('/getAll?page=&limit=&filter=',jwtHelper.requirePermission(JwtType.USER),handleGetAllTickets)
 router.get(':ticketId',jwtHelper.requirePermission(JwtType.USER),handleGetTicketDetails)
 
+
 export default router

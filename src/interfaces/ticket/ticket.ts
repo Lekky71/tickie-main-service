@@ -41,6 +41,7 @@ export interface UpdateTicketRequest extends TicketRequest{
 export interface  AllTicketsResponse {
   allTickets : Ticket[]
   filteredTickets : Ticket[]
+  ticketDrafts: Ticket[]
   totalPages : number
 }
 

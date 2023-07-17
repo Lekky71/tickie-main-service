@@ -71,11 +71,15 @@ export async function getAllTickets(body:AllTicketsRequest):Promise<AllTicketsRe
 
   const totalPages = Math.ceil(totalTickets/limit)
 
-  const allTickets = await TicketDb.find<Ticket>({event:event}).skip((page - 1) * limit).limit(limit)
+  const allTickets = await TicketDb.find<Ticket>({event:event,isDraft:false}).skip((page - 1) * limit).limit(limit)
   if(!allTickets){
     throw  new NotFoundError('No tickets available')
   }
-  const filteredTicket = await TicketDb.find<Ticket>({event: event,type:filter})
+  const ticketDrafts =  await TicketDb.find<Ticket>({event:event,isDraft:true}).skip((page - 1) * limit).limit(limit)
+  if(!ticketDrafts){
+    throw new NotFoundError('No ticket drafts')
+  }
+  const filteredTicket = await TicketDb.find<Ticket>({event: event,type:filter,isDraft:false})
   if(!filteredTicket){
     throw new NotFoundError('No ticket fitting this filter')
   }
@@ -83,6 +87,7 @@ export async function getAllTickets(body:AllTicketsRequest):Promise<AllTicketsRe
  return{
     allTickets:allTickets,
     filteredTickets: filteredTicket,
+    ticketDrafts: ticketDrafts,
     totalPages:totalPages,
  }
 
