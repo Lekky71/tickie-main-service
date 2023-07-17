@@ -6,7 +6,7 @@ import {
   Ticket,
   UpdateTicketRequest,
   AllTicketsResponse,
-  AllTicketsRequest
+  AllTicketsRequest, TicketDetailsRequest
 } from '../interfaces/ticket/ticket';
 
 export async function createTicket(body:TicketRequest):Promise<Ticket>{
@@ -72,12 +72,30 @@ export async function getAllTickets(body:AllTicketsRequest):Promise<AllTicketsRe
   const totalPages = Math.ceil(totalTickets/limit)
 
   const allTickets = await TicketDb.find<Ticket>({event:event}).skip((page - 1) * limit).limit(limit)
+  if(!allTickets){
+    throw  new NotFoundError('No tickets available')
+  }
   const filteredTicket = await TicketDb.find<Ticket>({event: event,type:filter})
+  if(!filteredTicket){
+    throw new NotFoundError('No ticket fitting this filter')
+  }
 
  return{
     allTickets:allTickets,
     filteredTickets: filteredTicket,
     totalPages:totalPages,
  }
+
+}
+
+export async function getTicketDetails(body:TicketDetailsRequest):Promise<Ticket>{
+  const {ticket,event} = body
+
+  const Ticket = await TicketDb.findOne<Ticket>({id:ticket,event:event})
+  if(!Ticket){
+    throw new NotFoundError('Ticket does not exist')
+  }
+
+  return Ticket!
 
 }

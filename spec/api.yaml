@@ -346,6 +346,35 @@ paths:
                     {"message":"No tickets found"}
 
 
+    /events/:eventId/tickets/:ticketId:
+      get:
+        summary: 'Get ticket detail'
+        tags:
+          - Ticket
+        parameters:
+          - $ref: '#/components/parameters/AuthToken'
+        responses:
+          200:
+            description: 'Success'
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Ticket'
+          404:
+            description: 'Ticket not found'
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    message:
+                      type: string
+                    example:
+                      {"message":"Ticket not found"}
+
+
+
+
 
 
 

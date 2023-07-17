@@ -51,3 +51,8 @@ export interface AllTicketsRequest{
   filter:string;
 
 }
+
+export interface  TicketDetailsRequest{
+  event:string
+  ticket:string
+}

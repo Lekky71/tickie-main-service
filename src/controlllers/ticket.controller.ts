@@ -59,3 +59,16 @@ export async function handleGetAllTickets(req:IExpressRequest,res:ExpressRespons
   }
 
 }
+
+export async function handleGetTicketDetails(req:IExpressRequest,res:ExpressResponse):Promise<void>{
+  const {eventId,ticketId} = req.params
+  const event = eventId
+  const ticket = ticketId
+
+  try{
+    const ticketDetails = await ticketService.getTicketDetails({event,ticket})
+    ResponseManager.success(res,{ticketDetails})
+  }catch(err:any){
+    ResponseManager.handleError(res,err)
+  }
+}
