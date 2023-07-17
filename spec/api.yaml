@@ -371,8 +371,35 @@ paths:
                       type: string
                     example:
                       {"message":"Ticket not found"}
-
-
+        delete:
+          summary: 'Delete Ticket'
+          tags:
+            - Ticket
+          parameters:
+            - $ref: '#/components/parameters/AuthToken'
+          responses:
+            200:
+              description: 'Success'
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        example:
+                          {"message":"Successfully deleted"}
+            401:
+              description: 'Unauthorized'
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                      example:
+                        {"message":"Unauthorized request"}
 
 
 
