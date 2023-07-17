@@ -72,3 +72,21 @@ export async function handleGetTicketDetails(req:IExpressRequest,res:ExpressResp
     ResponseManager.handleError(res,err)
   }
 }
+
+export async function handleDeleteTicket(req:IExpressRequest,res:ExpressResponse):Promise<void>{
+  const {eventId,ticketId} = req.params
+  const event = eventId
+  const ticket = ticketId
+
+
+  try{
+
+    await ticketService.deleteTicket({event,ticket})
+
+    ResponseManager.success(res,{message:'Successfully deleted'})
+
+  }catch (err:any){
+    ResponseManager.handleError(res,err)
+  }
+
+}

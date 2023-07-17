@@ -5,7 +5,7 @@ import { redisClient } from '../helpers/redis.connector';
 import { JwtType } from '../interfaces/user.verification';
 import { config } from '../constants/settings';
 import {
-  handleCreateTicket,
+  handleCreateTicket, handleDeleteTicket,
   handleEditTicketDetails,
   handleGetAllTickets,
   handleGetTicketDetails
@@ -26,6 +26,7 @@ router.post('/create-ticket',jwtHelper.requirePermission(JwtType.USER), handleCr
 router.put('/edit-ticket/:ticketId',jwtHelper.requirePermission(JwtType.USER),handleEditTicketDetails)
 router.get('/getAll?page=&limit=&filter=',jwtHelper.requirePermission(JwtType.USER),handleGetAllTickets)
 router.get(':ticketId',jwtHelper.requirePermission(JwtType.USER),handleGetTicketDetails)
+router.delete(':ticketId',jwtHelper.requirePermission(JwtType.USER),handleDeleteTicket)
 
 
 export default router

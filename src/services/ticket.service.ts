@@ -104,3 +104,11 @@ export async function getTicketDetails(body:TicketDetailsRequest):Promise<Ticket
   return Ticket!
 
 }
+
+export async function  deleteTicket(body:TicketDetailsRequest):Promise<void>{
+  const {ticket,event} = body
+
+  await TicketDb.findOneAndDelete({id:ticket,event:event})
+
+
+}
