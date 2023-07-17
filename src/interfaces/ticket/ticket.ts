@@ -26,6 +26,7 @@ export interface TicketRequest{
   type: string;
   total: number;
   available:number;
+  isDraft: boolean;
 
 }
 

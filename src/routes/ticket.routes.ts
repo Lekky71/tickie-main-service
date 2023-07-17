@@ -4,7 +4,7 @@ import { UserTokenDb } from '../models';
 import { redisClient } from '../helpers/redis.connector';
 import { JwtType } from '../interfaces/user.verification';
 import {config} from '../constants/settings';
-import { handleCreateTicket, handleEditTicketDetails } from '../controlllers/ticket';
+import { handleCreateTicket, handleEditTicketDetails } from '../controlllers/ticket.controller';
 
 
 const router = express.Router()

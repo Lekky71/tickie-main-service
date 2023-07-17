@@ -41,6 +41,11 @@ const TicketSchema = new Schema({
     type: Schema.Types.Number,
     required: true,
   },
+  isDraft:{
+    type:Boolean,
+    required:true,
+    default:true
+  }
 }, {
   toObject: {
     transform(doc, ret) {

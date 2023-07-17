@@ -5,7 +5,7 @@ import {TicketRequest,Ticket,UpdateTicketRequest} from '../interfaces/ticket/tic
 
 export async function createTicket(body:TicketRequest):Promise<Ticket>{
 
-  const {user,name,event,description,price,type,total,available} = body
+  const {user,name,event,description,price,type,total,available,isDraft} = body
 
   const linkedEvent = await EventDb.findById(event)
   if(!linkedEvent){
@@ -16,7 +16,6 @@ export async function createTicket(body:TicketRequest):Promise<Ticket>{
 
   }
 
-
   const ticket = await  TicketDb.create({
     name,
     event,
@@ -24,14 +23,15 @@ export async function createTicket(body:TicketRequest):Promise<Ticket>{
     price,
     type,
     total,
-    available
+    available,
+    isDraft
   })
   return ticket as unknown as Ticket
 
 }
 
 export async function editTicketDetails(body:UpdateTicketRequest):Promise<Ticket>{
-  const {user,name,event,description,price,type,total,available,ticket} = body
+  const {user,name,event,description,price,type,total,available,ticket,isDraft} = body
 
   const linkedEvent = await EventDb.findById(event)
   if(!linkedEvent){
@@ -50,6 +50,7 @@ export async function editTicketDetails(body:UpdateTicketRequest):Promise<Ticket
     type,
     total,
     available,
+    isDraft
   })
 
   const editedTicket = await TicketDb.findById(ticket)
