@@ -515,6 +515,7 @@ components:
         - type
         - total
         - available
+        - isDraft
       properties:
         name:
           type: string
@@ -530,6 +531,8 @@ components:
           type: string
         available:
           type:string
+        isDraft:
+          type: boolean
 
 
 
@@ -545,6 +548,7 @@ components:
         - type
         - total
         - available
+        - isDraft
       properties:
         id:
           type: string
@@ -562,4 +566,6 @@ components:
           type: number
         available:
           type: number
+        isDraft:
+          type:boolean
 

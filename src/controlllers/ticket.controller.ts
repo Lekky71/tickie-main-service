@@ -22,6 +22,8 @@ export async function handleCreateTicket(req:IExpressRequest,res:ExpressResponse
 }
 
 
+
+// client can use the edit endpoint to also save draft, just set the isDraft field to false
 export async function handleEditTicketDetails(req:IExpressRequest,res:ExpressResponse):Promise<void>{
 
   const {ticketId,eventId} = req.params!
