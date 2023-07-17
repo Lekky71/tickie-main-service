@@ -57,3 +57,13 @@ export interface  TicketDetailsRequest{
   event:string
   ticket:string
 }
+
+
+export interface  PurchaseFreeTicketRequest{
+  user:string;
+  event:string;
+  ticket:string;
+  email:string;
+  metadata?:object;
+
+}

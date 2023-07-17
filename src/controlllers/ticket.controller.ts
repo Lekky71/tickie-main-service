@@ -90,3 +90,21 @@ export async function handleDeleteTicket(req:IExpressRequest,res:ExpressResponse
   }
 
 }
+
+
+export async function handlePurchaseFreeTicket(req:IExpressRequest,res:ExpressResponse):Promise<void>{
+  const user = req.userId!
+  const {eventId,ticketId} = req.params
+  const event = eventId
+  const ticket = ticketId
+  const {email,metadata} = req.body
+
+
+  try{
+    await ticketService.purchaseFreeTicket({user,event,ticket,email,metadata})
+    ResponseManager.success(res,{message:'successfully purchased ticket'})
+
+  }catch (err:any){
+    ResponseManager.handleError(res,err)
+  }
+}

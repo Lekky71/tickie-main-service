@@ -6,8 +6,12 @@ import {
   Ticket,
   UpdateTicketRequest,
   AllTicketsResponse,
-  AllTicketsRequest, TicketDetailsRequest
+  AllTicketsRequest, TicketDetailsRequest, PurchaseFreeTicketRequest
 } from '../interfaces/ticket/ticket';
+import { TransactionDb } from '../models/transaction';
+import { AssetDb } from '../models/asset';
+import { ClerkType, TransactionStatus, TransactionType } from '../interfaces/wallet/transaction';
+import { PurchasedTicketDb } from '../models/purchased.ticket';
 
 export async function createTicket(body:TicketRequest):Promise<Ticket>{
 
@@ -109,6 +113,52 @@ export async function  deleteTicket(body:TicketDetailsRequest):Promise<void>{
   const {ticket,event} = body
 
   await TicketDb.findOneAndDelete({id:ticket,event:event})
+
+
+}
+
+
+export async function purchaseFreeTicket(body:PurchaseFreeTicketRequest):Promise<void>{
+  const {user,event,ticket,email,metadata} = body
+  const asset = await AssetDb.findOne({user:user})
+  if(!asset){
+    throw new NotFoundError('User has not assets')
+  }
+
+  const Ticket = await TicketDb.findOne<Ticket>({event:event,id:ticket})
+  if(!Ticket){
+    throw  new NotFoundError('This ticket does not exist')
+  }
+
+  Ticket!.available = +Ticket!.available - 1
+  await Ticket.save()
+
+  const transaction = await TransactionDb.create({
+    user:user,
+    asset:asset?.id,
+    symbol:'NGN',
+    status: TransactionStatus.SUCCESSFUL,
+    amount:0.00,
+    fee:0.00,
+    totalAmount:0.00,
+    clerkType:ClerkType.DEBIT,
+    type: TransactionType.PURCHASE,
+    reason: ticket,
+    description:'Ticket Purchase',
+    metadata: metadata
+  })
+
+  await PurchasedTicketDb.create({
+    ticket,
+    purchasedAt:Date.now(),
+    buyer:user,
+    email:email,
+    metadata:metadata,
+    transaction: transaction.id,
+    used:false
+
+  })
+
 
 
 }

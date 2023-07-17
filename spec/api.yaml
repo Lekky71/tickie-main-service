@@ -402,6 +402,44 @@ paths:
                         {"message":"Unauthorized request"}
 
 
+      /events/:eventId/tickets/:ticketId/purchase-free:
+        post:
+          summary: 'buy a ticket'
+          tags:
+            - Ticket
+          parameters:
+            - $ref: '#/components/parameters/AuthToken'
+          requestBody:
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/FreeTicketRequest'
+              required: true
+          responses:
+            200:
+              description: "Successfully purchased tickets"
+              content:
+                application/json:
+                  schema:
+                    $ref: '#/components/schemas/DefaultResponse'
+            400:
+              description: "error in purchase"
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    properties:
+                      error:
+                        type: string
+
+
+
+
+
+
+
+
+
 
 
 
@@ -616,6 +654,18 @@ components:
           type:string
         isDraft:
           type: boolean
+
+    FreeTicketRequest:
+      type: object
+      required:
+        - email
+      properties:
+        email:
+          type: string
+          format: email
+        metadata:
+          type: object
+
 
 
 
