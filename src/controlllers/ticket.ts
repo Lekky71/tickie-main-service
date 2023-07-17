@@ -6,7 +6,9 @@ import * as ResponseManager from '../helpers/response.manager'
 
 export async function handleCreateTicket(req:IExpressRequest,res:ExpressResponse):Promise<void>{
   const user = req.userId!
-  const {name,event,description,price,type,total,available} = req.body
+  const {eventId} = req.params
+  const event = eventId
+  const {name,description,price,type,total,available} = req.body
 
   try{
 
@@ -22,9 +24,12 @@ export async function handleCreateTicket(req:IExpressRequest,res:ExpressResponse
 
 export async function handleEditTicketDetails(req:IExpressRequest,res:ExpressResponse):Promise<void>{
 
-  const {ticket} = req.params!
+  const {ticketId,eventId} = req.params!
+  const event = eventId
+  const ticket = ticketId
+
   const user = req.userId!
-  const {name,event,description,price,type,total,available} = req.body
+  const {name,description,price,type,total,available} = req.body
 
   try{
     const editedTicket = await ticketService.editTicketDetails({name,event,description,price,type,total,available,ticket,user})

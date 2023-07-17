@@ -257,7 +257,7 @@ paths:
 
 
  # API specs for endpoints related to ticket
-  /ticket/create-ticket:
+  /events/:eventId/tickets/create-ticket:
     post:
       summary: 'Ticket: create Ticket'
       tags:
@@ -288,7 +288,7 @@ paths:
                   error:
                     type: string
 
-  /ticket/edit-ticket/:ticketId:
+  /events/:eventId/tickets/edit-ticket/:ticketId:
     put:
       summary: 'Ticket: update Ticket'
       tags:
