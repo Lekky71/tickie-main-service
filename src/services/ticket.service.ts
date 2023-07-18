@@ -63,26 +63,32 @@ export async function editTicketDetails(body:UpdateTicketRequest):Promise<Ticket
 }
 
 export async function getAllTickets(body:AllTicketsRequest):Promise<AllTicketsResponse>{
+  let allTickets
 
   const {event,page,limit,filter} = body
   const totalTickets = await TicketDb.find<Ticket>({event:event}).countDocuments()
 
   const totalPages = Math.ceil(totalTickets/limit)
+  if(filter){
+    allTickets = await TicketDb.find<Ticket>({event: event,type:filter})
+    if(!allTickets){
+      throw new NotFoundError('No ticket fitting this filter')
+    }
 
-  const allTickets = await TicketDb.find<Ticket>({event:event,isDraft:false}).skip((page - 1) * limit).limit(limit)
+  }
+
+  allTickets = await TicketDb.find<Ticket>({event:event}).skip((page - 1) * limit).limit(limit)
   if(!allTickets){
     throw  new NotFoundError('No tickets available')
   }
 
-  const filteredTicket = await TicketDb.find<Ticket>({event: event,type:filter,isDraft:false})
-  if(!filteredTicket){
-    throw new NotFoundError('No ticket fitting this filter')
-  }
-
  return{
     allTickets:allTickets,
-    filteredTickets: filteredTicket,
-    totalPages:totalPages,
+    pagination:{
+      page:page,
+      limit:limit,
+      totalCount:totalPages,
+    },
  }
 
 }

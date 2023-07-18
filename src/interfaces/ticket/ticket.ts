@@ -42,8 +42,11 @@ export interface UpdateTicketRequest extends CreateTicketRequest{
 
 export interface  AllTicketsResponse {
   allTickets : Ticket[]
-  filteredTickets : Ticket[]
-  totalPages : number
+  pagination : {
+    page:number;
+    limit:number;
+    totalCount:number
+  }
 }
 
 export interface AllTicketsRequest{
