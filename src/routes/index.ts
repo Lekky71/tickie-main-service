@@ -15,6 +15,6 @@ router.use('/health', (req, res) => {
   res.send({ status: 'OK' });
 });
 
-router.use('*', routeError);
+router.use(routeError);
 
 export default router;

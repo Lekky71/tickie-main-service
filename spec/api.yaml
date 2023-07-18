@@ -216,12 +216,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                example:
-                  { "message": "User not found" }
+                $ref: '#/components/schemas/NotFoundResponse'
 
   /user/change-password:
     put:
@@ -256,70 +251,38 @@ paths:
                   { "message": "Your current password is wrong, you've two tries left" }
 
   /events:
-    get:
-      summary: 'Get events with query pagination, search query, and query size'
-      tags:
-        - Events
-      parameters:
-        - in: query
-          name: page
-          schema:
-            type: number
-          description: The number of items to skip before starting to collect the result set
-        - in: query
-          name: size
-          schema:
-            type: number
-          description: The numbers of items to return
-        - in: query
-          name: privacy
-          schema:
-            type: string
-        - in: query
-          name: name
-          schema:
-            type: string
-        - in: query
-          name: type
-          schema:
-            type: string
-        - in: query
-          name: searchQuery
-          schema:
-            type: string
-      operationId: Get Events
-      responses:
-        200:
-          description: 'Success'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Event'
-        400:
-          description: 'Error'
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                example:
-                  { "message": "Bad request, try again with the appropriate parameters" }
     post:
       summary: 'Create a new event'
-      description: 'Takes in { ?draft=true } query parameter to save an event as a draft, boolean {true} as the only value'
+      description: 'Create new events, can also save events as drafts too'
       tags:
         - Events
       parameters:
         - $ref: '#/components/parameters/AuthToken'
-      operationId: Post Events
+      operationId: PostEvents
       requestBody:
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/Event'
       responses:
+        201:
+          description: 'Success'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreatEventResponse'
+        400:
+          description: 'Error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestResponse'
+    get:
+      summary: 'And endpoint for users to get their own events'
+      tags:
+        - Events
+      operationId: GetEvents
+      responses:
         200:
           description: 'Success'
           content:
@@ -331,12 +294,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                example:
-                  { "message": "Bad request, try again." }
+                $ref: '#/components/schemas/BadRequestResponse'
 
   /events/{eventId}:
     put:
@@ -346,7 +304,7 @@ paths:
       parameters:
         - $ref: '#/components/parameters/AuthToken'
         - $ref: '#/components/parameters/EventID'
-      operationId: Post Events
+      operationId: EditEvents
 
       requestBody:
         content:
@@ -365,12 +323,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                example:
-                  { "message": "No event found with the provided parameters" }
+                $ref: '#/components/schemas/NotFoundResponse'
     delete:
       summary: 'Delete Already existing events by only the creator'
       tags:
@@ -378,7 +331,7 @@ paths:
       parameters:
         - $ref: '#/components/parameters/AuthToken'
         - $ref: '#/components/parameters/EventID'
-      operationId: Delete Events
+      operationId: DeleteEvents
       responses:
         200:
           description: 'Success'
@@ -391,19 +344,14 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                example:
-                  { "message": "No event found with the provided parameters" }
+                $ref: '#/components/schemas/NotFoundResponse'
     get:
       summary: 'Get Event'
       tags:
         - Events
       parameters:
         - $ref: '#/components/parameters/EventID'
-      operationId: Get Event
+      operationId: GetEvent
       responses:
         200:
           description: 'Success'
@@ -416,20 +364,32 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                example:
-                  { "message": "No event found with the provided parameters" }
-  /events/drafts:
+                $ref: '#/components/schemas/NotFoundResponse'
+
+  /events/explore:
     get:
-      summary: 'Get Draft events by creator'
-      parameters:
-        - $ref: '#/components/parameters/AuthToken'
+      summary: 'Get events with query pagination, search query, and query size'
       tags:
         - Events
-      operationId: Get Draft Events
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+            minimum: 1
+          description: The number of items to skip before starting to collect the result set
+        - in: query
+          name: size
+          schema:
+            type: integer
+            maximum: 50
+          description: The numbers of items to return per query
+        - in: query
+          name: search
+          schema:
+            type: string
+          description: search query for filtering
+      operationId: GetEvents
       responses:
         200:
           description: 'Success'
@@ -442,12 +402,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                example:
-                  { "message": "Bad request, try again with the appropriate parameters" }
+                $ref: '#/components/schemas/BadRequestResponse'
 
 components:
   parameters:
@@ -555,6 +510,24 @@ components:
           type: string
       required:
         - message
+
+    NotFoundResponse:
+      type: object
+      properties:
+        message:
+          type: string
+      example:
+        { "message": "No resource found" }
+
+
+    BadRequestResponse:
+      type: object
+      properties:
+        message:
+          type: string
+      example:
+        { "message": "Bad request, try again" }
+
     User:
       type: object
       required:
@@ -655,4 +628,32 @@ components:
         name: Myke's Event
         creator: 827472882-28284772jwjuj2wej-23
 
+    CreatEventResponse:
+      title: CreateEventResponse
+      type: object
+      properties:
+        pagination:
+          type: object
+          properties:
+            page:
+              type: integer
+            size:
+              type: integer
+            lastPage:
+              type: integer
+            totalCount:
+              type: integer
+            events:
+              $ref: '#/components/schemas/Event'
+          example:
+            {
+              "pagination": {
+                "page": 1,
+                "size": 50,
+                "lastPage": 5,
+                "totalCount": 241
+              },
+
+              "events": [ ]
+            }
 

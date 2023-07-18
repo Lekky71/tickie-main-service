@@ -1,49 +1,39 @@
 import { IPagination, NotFoundError } from '../interfaces';
 import { EventDb } from '../models';
-import { IEventDocument } from '../interfaces/event/event.interface';
+import { CreateEvent, EditEvent, IEventDocument } from '../interfaces/event/event.interface';
 
 
-export async function createEvent(body: IEventDocument, isDraftQuery: string): Promise<IEventDocument> {
-  if (isDraftQuery === 'true') {
-    body.isDraft = true
-  }
+export async function createEvent(body: CreateEvent): Promise<IEventDocument> {
   return await EventDb.create(body)
 }
 
-export async function getEvents(query: IPagination): Promise<IEventDocument[]> {
-  let events: IEventDocument[];
-  const VALID_FILTER_TYPES = ['name', 'type', 'privacy']
-  let filter: any = { isDraft: false };
 
-  /**I try to figure out the totalCount and LastPage on the Ipagination interface, but I couldn't figure it out */
-  const { page, size, searchQuery } = query;
-
-  // const type = query.type.toUpperCase()
-
-  for (const filterType of VALID_FILTER_TYPES) {
-    if (query[filterType] !== undefined) {
-      filter[filterType] = query[filterType];
-    }
+export async function getAllEvents(body: { page: number, size: number, search: string }): Promise<{
+  pagination: IPagination,
+  events: IEventDocument[]
+}> {
+  const { search, page, size } = body;
+  const query = { fullName: { $regex: search, $options: 'i' } };
+  const count = await EventDb.countDocuments(query);
+  const events = await EventDb.find<IEventDocument>(query)
+    .skip((page - 1) * size)
+    .limit(size);
+  return {
+    pagination: {
+      page,
+      size,
+      lastPage: Math.ceil(count / size),
+      totalCount: count,
+    },
+    events,
   }
-
-  console.log(filter)
-
-  if (searchQuery) {
-    /**search should not have a filter*/
-    events = await EventDb.search(searchQuery, { isDraft: false })
-  } else if (page && size) {
-    events = await EventDb.find(filter)
-      .limit(+size)
-      .skip((+page - 1) * +size);
-  } else {
-    events = await EventDb.find(filter)
-  }
-
-  return events
 }
 
 export async function getOneEvent(eventId: string): Promise<IEventDocument> {
-  const event = await EventDb.findById<IEventDocument>(eventId);
+  const event = await EventDb.findById<IEventDocument>(eventId).populate({
+    path: 'creator',
+    select: 'email fullName avatar'
+  });
   if (!event) {
     throw new NotFoundError('no event found with the provided id')
   }
@@ -51,8 +41,9 @@ export async function getOneEvent(eventId: string): Promise<IEventDocument> {
   return event
 }
 
-export async function updateEvent(eventId: string, body: IEventDocument): Promise<IEventDocument> {
-  const updatedEvent = await EventDb.findByIdAndUpdate<IEventDocument>(eventId, body, { new: true })
+/**This will be work in progress*/
+export async function updateEvent(filter: { _id: string, creator: string }, body: EditEvent): Promise<IEventDocument> {
+  const updatedEvent = await EventDb.findByIdAndUpdate<IEventDocument>(filter, body, { new: true })
   if (!updatedEvent) {
     throw new NotFoundError('no event found with the provided id')
   }
@@ -60,8 +51,9 @@ export async function updateEvent(eventId: string, body: IEventDocument): Promis
   return updatedEvent
 }
 
-export async function deleteEvent(eventId: string): Promise<string> {
-  const event = await EventDb.findByIdAndDelete<IEventDocument>(eventId)
+/**This will be work in progress*/
+export async function deleteEvent(filter: { _id: string, creator: string }): Promise<string> {
+  const event = await EventDb.findByIdAndDelete<IEventDocument>(filter)
   if (!event) {
     throw new NotFoundError('no event found with the provided id')
   }
@@ -69,6 +61,6 @@ export async function deleteEvent(eventId: string): Promise<string> {
   return 'Event deleted successfully';
 }
 
-export function getDraftEvents(): Promise<IEventDocument[]> {
-  return EventDb.find({ isDraft: true });
+export function getMyEvents(userId: string): Promise<IEventDocument[]> {
+  return EventDb.find({ _id: userId });
 }

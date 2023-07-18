@@ -14,17 +14,14 @@ const EventSchema = new Schema<IEventDocument, IEventModel>({
   name: {
     type: String,
     required: true,
-    search: true
   },
   description: {
     type: String,
     required: true,
-    search: true
   },
   date: {
     type: Date,
     required: true,
-    search: true
   },
   creator: {
     index: true,
@@ -40,17 +37,14 @@ const EventSchema = new Schema<IEventDocument, IEventModel>({
     type: String,
     required: true,
     enum: Object.values(EventType), // PAID, FREE
-    search: true
   },
   isPublic: {
     type: Boolean,
     default: true,
-    search: true
   },
   location: {
     type: String,
     required: true,
-    search: true,
   },
 
   isDraft: {
@@ -76,6 +70,5 @@ const EventSchema = new Schema<IEventDocument, IEventModel>({
 });
 
 
-EventSchema.plugin(require('mongoose-regex-search'));
 /**same name with user verification, so I change it*/
 export const EventDb = mongoose.model<IEventDocument, IEventModel>(config.mongodb.collections.events, EventSchema);

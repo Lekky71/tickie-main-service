@@ -4,63 +4,77 @@ import { IExpressRequest, } from '../interfaces';
 import * as ResponseManager from '../helpers/response.manager';
 
 
-export async function handleCreateEvent(req: IExpressRequest, res: Response, next: NextFunction): Promise<void> {
+export async function handleCreateEvent(req: IExpressRequest, res: Response): Promise<void> {
   try {
-    // attach user id to the req.body
     req.body.creator = <string>req.userId;
-    const draftQueryParam = <string>req.query.draft
-    const response = await EventService.createEvent(req.body, draftQueryParam)
+    const { name, description, creator, location, type, isDraft, date, endDate, isPublic } = req.body
+    const response = await EventService.createEvent(
+      { name, description, creator, location, type, isDraft, date, endDate, isPublic })
     return ResponseManager.success(res, response);
   } catch (error: unknown) {
-    next(error);
+    ResponseManager.handleError(res, error)
   }
 }
 
 
-export async function handleGetEvents(req: IExpressRequest, res: Response, next: NextFunction): Promise<void> {
+export async function handleGetEvents(req: IExpressRequest, res: Response): Promise<void> {
   try {
-    const response = await EventService.getEvents(req.query)
+    const { page, size, search } = req.query
+    const response = await EventService.getAllEvents({ page, size, search })
     return ResponseManager.success(res, response);
   } catch (error: unknown) {
-    next(error)
+    ResponseManager.handleError(res, error)
   }
 }
 
-export async function handleGetOneEvent(req: IExpressRequest, res: Response, next: NextFunction): Promise<void> {
+export async function handleGetOneEvent(req: IExpressRequest, res: Response): Promise<void> {
   try {
-    const response = await EventService.getOneEvent(<string>req.params.eventId);
+    const eventId = <string>req.params.eventId
+    const response = await EventService.getOneEvent(eventId);
     return ResponseManager.success(res, response);
   } catch (error: unknown) {
-    next(error)
+    ResponseManager.handleError(res, error)
   }
 }
 
 export async function handleUpdateEvent(req: IExpressRequest, res: Response, next: NextFunction): Promise<void> {
   try {
-    const response = await EventService.updateEvent(<string>req.params.eventId, req.body);
+    const { name, description, creator, location, type, isDraft, date, endDate, isPublic } = req.body
+    const filter = { _id: <string>req.params.eventId, creator: <string>req.userId }
+    const response = await EventService.updateEvent(filter, {
+      name,
+      description,
+      creator,
+      location,
+      type,
+      isDraft,
+      date,
+      endDate,
+      isPublic
+    });
     return ResponseManager.success(res, response);
   } catch (error: unknown) {
-    next(error)
+    ResponseManager.handleError(res, error)
   }
 
 }
 
-export async function handleDeleteEvent(req: IExpressRequest, res: Response, next: NextFunction): Promise<void> {
+export async function handleDeleteEvent(req: IExpressRequest, res: Response): Promise<void> {
   try {
-    const response = await EventService.deleteEvent(<string>req.params.eventId);
+    const filter = { _id: <string>req.params.eventId, creator: <string>req.userId }
+    const response = await EventService.deleteEvent(filter);
     return ResponseManager.success(res, response);
   } catch (error: unknown) {
-    next(error)
+    ResponseManager.handleError(res, error)
   }
 }
 
-export async function handleGetAllDraftEvents(req: IExpressRequest, res: Response, next: NextFunction): Promise<void> {
+export async function handleGetMyEvents(req: IExpressRequest, res: Response): Promise<void> {
   try {
-    const response = await EventService.getDraftEvents();
+    const userId = <string>req.userId
+    const response = await EventService.getMyEvents(userId);
     return ResponseManager.success(res, response);
   } catch (error: unknown) {
-    next(error)
+    ResponseManager.handleError(res, error)
   }
 }
-
-// I feel the frontend can get each draft out of the array:

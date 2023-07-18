@@ -1,5 +1,12 @@
 import { Router } from 'express';
 import * as EventController from '../controlllers/event.controller';
+import {
+  handleCreateEvent,
+  handleDeleteEvent,
+  handleGetMyEvents,
+  handleGetOneEvent,
+  handleUpdateEvent
+} from '../controlllers/event.controller';
 import { JwtType } from '../interfaces/user.verification';
 import { JwtHelper } from '../helpers/jwt.helper';
 import { config } from '../constants/settings';
@@ -12,24 +19,19 @@ const jwtHelper = new JwtHelper({
   redisClient: redisClient,
 });
 
-/**strict:true?, we decided to mount routers, to avoid mounted router overlaps*/
-const router: Router = Router({ strict: true })
+const router: Router = Router();
 
 
-/** params for event is eventId,-> :eventId*/
+router.get('/', jwtHelper.requirePermission(JwtType.USER), handleGetMyEvents)
 
-router.route('/').get(EventController.handleGetEvents)
-  .post(jwtHelper.requirePermission(JwtType.SELLER), EventController.handleGetEvents)
+router.post('/', jwtHelper.requirePermission(JwtType.USER), handleCreateEvent)
 
-router.route('/:eventId').get(EventController.handleGetOneEvent)
-  .delete(jwtHelper.requirePermission(JwtType.SELLER), EventController.handleDeleteEvent)
-  .put(jwtHelper.requirePermission(JwtType.SELLER), EventController.handleUpdateEvent)
+router.get('/:eventId', jwtHelper.requirePermission(JwtType.USER), handleGetOneEvent)
 
-router.get('/drafts', EventController.handleGetAllDraftEvents)
-/**we want to mount the ticket router on the event router */
-// router.use('/:eventId',tickerRouter)
-  //so we can have something like events/:eventId/tickets/:ticketId or
-  //events/"eventId/tickets
+router.delete('/:eventId', jwtHelper.requirePermission(JwtType.USER), handleDeleteEvent)
 
+router.put('/:eventId', jwtHelper.requirePermission(JwtType.USER), handleUpdateEvent)
+
+router.get('/explore', EventController.handleGetEvents)
 
 export const EventRouter = router
