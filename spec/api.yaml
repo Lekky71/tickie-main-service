@@ -257,7 +257,7 @@ paths:
 
 
  # API specs for endpoints related to ticket
-  /events/:eventId/tickets/create-ticket:
+  /events/:eventId/tickets?page=&limit=&filter=:
     post:
       summary: 'Ticket: create Ticket'
       tags:
@@ -283,70 +283,57 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  error:
-                    type: string
+                $ref: '#/components/schemas/ErrorResponse'
 
-  /events/:eventId/tickets/edit-ticket/:ticketId:
-    put:
-      summary: 'Ticket: update Ticket'
+    get:
+      summary: 'Get all tickets'
       tags:
         - Ticket
-      operationId: UpdateTicket
       parameters:
         - $ref: '#/components/parameters/AuthToken'
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/TicketRequest'
-        required: true
       responses:
         200:
           description: 'Success'
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DefaultResponse'
-        400:
-          description: "Error"
+                $ref: '#/components/schemas/GetTicketResponse'
+        404:
+          description: 'No ticket found'
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  error:
-                    type: string
+                $ref: '#/components/schemas/ErrorResponse'
 
-    /events/:eventId/tickets/getAll?page=&limit=&filter=:
-      get:
-        summary: 'Get all tickets'
+
+    /events/:eventId/tickets/:ticketId:
+      put:
+        summary: 'Ticket: update Ticket'
         tags:
           - Ticket
+        operationId: UpdateTicket
         parameters:
           - $ref: '#/components/parameters/AuthToken'
+        requestBody:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TicketRequest'
+          required: true
         responses:
           200:
             description: 'Success'
             content:
               application/json:
                 schema:
-                  $ref: '#/components/schemas/Ticket'
-          404:
-            description: 'No ticket found'
+                  $ref: '#/components/schemas/DefaultResponse'
+          400:
+            description: "Error"
             content:
               application/json:
                 schema:
-                  type: object
-                  properties:
-                    message:
-                      type: string
-                  example:
-                    {"message":"No tickets found"}
+                  $ref: '#/components/schemas/ErrorResponse'
 
-
-    /events/:eventId/tickets/:ticketId:
       get:
         summary: 'Get ticket detail'
         tags:
@@ -365,12 +352,7 @@ paths:
             content:
               application/json:
                 schema:
-                  type: object
-                  properties:
-                    message:
-                      type: string
-                    example:
-                      {"message":"Ticket not found"}
+                  $ref: '#/components/schemas/ErrorResponse'
         delete:
           summary: 'Delete Ticket'
           tags:
@@ -383,26 +365,16 @@ paths:
               content:
                 application/json:
                   schema:
-                    type: object
-                    properties:
-                      message:
-                        type: string
-                        example:
-                          {"message":"Successfully deleted"}
+                   $ref: '#/components/schemas/DefaultResponse'
             401:
               description: 'Unauthorized'
               content:
                 application/json:
                   schema:
-                    type: object
-                    properties:
-                      message:
-                        type: string
-                      example:
-                        {"message":"Unauthorized request"}
+                    $ref: '#/components/schemas/ErrorResponse'
 
 
-      /events/:eventId/tickets/:ticketId/purchase-free:
+      /events/:eventId/tickets/:ticketId/purchase:
         post:
           summary: 'buy a ticket'
           tags:
@@ -413,7 +385,7 @@ paths:
             content:
               application/json:
                 schema:
-                  $ref: '#/components/schemas/FreeTicketRequest'
+                  $ref: '#/components/schemas/TicketPurchaseRequest'
               required: true
           responses:
             200:
@@ -427,18 +399,7 @@ paths:
               content:
                 application/json:
                   schema:
-                    type: object
-                    properties:
-                      error:
-                        type: string
-
-
-
-
-
-
-
-
+                    $ref : '#/components/schemas/ErrorResponse'
 
 
 
@@ -655,7 +616,7 @@ components:
         isDraft:
           type: boolean
 
-    FreeTicketRequest:
+    TicketPurchaseRequest:
       type: object
       required:
         - email
@@ -665,6 +626,16 @@ components:
           format: email
         metadata:
           type: object
+
+
+    GetTicketResponse:
+      title: ticketResponse
+      type: object
+      properties:
+        pagination:
+          type: object
+        tickets:
+          type: object[]
 
 
 
