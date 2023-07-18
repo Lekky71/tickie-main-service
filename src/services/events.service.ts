@@ -12,13 +12,23 @@ export async function createEvent(body: IEventDocument, isDraftQuery: string): P
 
 export async function getEvents(query: IPagination): Promise<IEventDocument[]> {
   let events: IEventDocument[];
-  let filter = { isDraft: false };
+  const VALID_FILTER_TYPES = ['name', 'type', 'privacy']
+  let filter: any = { isDraft: false };
 
-  /**I try to figure out the totalCount and LastPage Ipagination interface, but I couldn't figure it out */
-  const { page, totalCount, lastPage, size, searchQuery } = query;
+  /**I try to figure out the totalCount and LastPage on the Ipagination interface, but I couldn't figure it out */
+  const { page, size, searchQuery } = query;
+
+  // const type = query.type.toUpperCase()
+
+  for (const filterType of VALID_FILTER_TYPES) {
+    if (query[filterType] !== undefined) {
+      filter[filterType] = query[filterType];
+    }
+  }
+
   if (searchQuery) {
-    // filter[operationId]= 'any filter we want to add to search query'
-    events = await EventDb.search(searchQuery, filter)
+    /**search should not have a filter*/
+    events = await EventDb.search(searchQuery, { isDraft: false })
   } else if (page && size) {
     events = await EventDb.find(filter)
       .limit(+size)

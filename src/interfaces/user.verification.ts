@@ -21,4 +21,5 @@ export enum JwtType {
   NEW_USER = 'NEW_USER',
   USER = 'USER',
   TRANSACTING_USER = 'TRANSACTING_USER',
+  SELLER='SELLER'
 }
