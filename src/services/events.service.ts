@@ -52,7 +52,7 @@ export async function getOneEvent(eventId: string): Promise<IEventDocument> {
 }
 
 export async function updateEvent(eventId: string, body: IEventDocument): Promise<IEventDocument> {
-  const updatedEvent = await EventDb.findByIdAndUpdate<IEventDocument>(eventId, body)
+  const updatedEvent = await EventDb.findByIdAndUpdate<IEventDocument>(eventId, body, { new: true })
   if (!updatedEvent) {
     throw new NotFoundError('no event found with the provided id')
   }
