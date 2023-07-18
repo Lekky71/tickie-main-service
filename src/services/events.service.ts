@@ -26,6 +26,8 @@ export async function getEvents(query: IPagination): Promise<IEventDocument[]> {
     }
   }
 
+  console.log(filter)
+
   if (searchQuery) {
     /**search should not have a filter*/
     events = await EventDb.search(searchQuery, { isDraft: false })

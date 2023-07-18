@@ -260,6 +260,33 @@ paths:
       summary: 'Get events with query pagination, search query, and query size'
       tags:
         - Events
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: number
+          description: The number of items to skip before starting to collect the result set
+        - in: query
+          name: size
+          schema:
+            type: number
+          description: The numbers of items to return
+        - in: query
+          name: privacy
+          schema:
+            type: string
+        - in: query
+          name: name
+          schema:
+            type: string
+        - in: query
+          name: type
+          schema:
+            type: string
+        - in: query
+          name: searchQuery
+          schema:
+            type: string
       operationId: Get Events
       responses:
         200:

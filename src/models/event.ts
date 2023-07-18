@@ -19,7 +19,6 @@ const EventSchema = new Schema<IEventDocument, IEventModel>({
   description: {
     type: String,
     required: true,
-    description: true,
     search: true
   },
   date: {
