@@ -270,7 +270,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CreatEventResponse'
+                $ref: '#/components/schemas/CreateEventDto'
         400:
           description: 'Error'
           content:
@@ -396,7 +396,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Event'
+                $ref: '#/components/schemas/GetEventsResponse'
         400:
           description: 'Error'
           content:
@@ -627,8 +627,26 @@ components:
       example:
         name: Myke's Event
         creator: 827472882-28284772jwjuj2wej-23
+    CreateEventDto:
+      type: object
+      required:
+        - name
+        - creator
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+          format: email
+        endDate:
+          type: string
+        creator:
+          type: string
+      example:
+        name: Myke's Event
+        creator: 827472882-28284772jwjuj2wej-23
 
-    CreatEventResponse:
+    GetEventsResponse:
       title: CreateEventResponse
       type: object
       properties:
