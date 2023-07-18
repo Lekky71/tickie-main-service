@@ -2,7 +2,7 @@ import {TicketDb} from '../models/ticket';
 import {EventDb} from '../models/event';
 import {BadRequestError,NotFoundError} from '../interfaces';
 import {
-  TicketRequest,
+  CreateTicketRequest,
   Ticket,
   UpdateTicketRequest,
   AllTicketsResponse,
@@ -13,54 +13,48 @@ import { AssetDb } from '../models/asset';
 import { ClerkType, TransactionStatus, TransactionType } from '../interfaces/wallet/transaction';
 import { PurchasedTicketDb } from '../models/purchased.ticket';
 
-export async function createTicket(body:TicketRequest):Promise<Ticket>{
+export async function createTicket(body:CreateTicketRequest):Promise<Ticket>{
 
-  const {user,name,event,description,price,type,total,available,isDraft} = body
+  const {user,name,event,description,price,type,total,available,image} = body
 
-  const linkedEvent = await EventDb.findById(event)
+  const linkedEvent = await EventDb.findOne({_id:event,creator:user})
   if(!linkedEvent){
-    throw new NotFoundError('This event does not exist')
+    throw new NotFoundError('Unauthorised')
   }
-  if(linkedEvent?.creator !== user){
-    throw new BadRequestError('unauthorised ticket creation')
 
-  }
 
   const ticket = await  TicketDb.create({
     name,
     event,
+    image,
     description,
     price,
     type,
     total,
     available,
-    isDraft
   })
   return ticket as unknown as Ticket
 
 }
 
 export async function editTicketDetails(body:UpdateTicketRequest):Promise<Ticket>{
-  const {user,name,event,description,price,type,total,available,ticket,isDraft} = body
+  const {user,name,event,description,price,type,total,available,ticket,image} = body
 
-  const linkedEvent = await EventDb.findById(event)
+  const linkedEvent = await EventDb.findOne({_id:event,creator:user})
   if(!linkedEvent){
-    throw new NotFoundError('This event does not exist')
+    throw new NotFoundError('Unauthorised')
   }
-  if(linkedEvent?.creator !== user){
-    throw new BadRequestError('unauthorised ticket creation')
 
-  }
 
   await TicketDb.updateOne({id:ticket},{
     name,
+    image,
     event,
     description,
     price,
     type,
     total,
     available,
-    isDraft
   })
 
   const editedTicket = await TicketDb.findById(ticket)
@@ -79,10 +73,7 @@ export async function getAllTickets(body:AllTicketsRequest):Promise<AllTicketsRe
   if(!allTickets){
     throw  new NotFoundError('No tickets available')
   }
-  const ticketDrafts =  await TicketDb.find<Ticket>({event:event,isDraft:true}).skip((page - 1) * limit).limit(limit)
-  if(!ticketDrafts){
-    throw new NotFoundError('No ticket drafts')
-  }
+
   const filteredTicket = await TicketDb.find<Ticket>({event: event,type:filter,isDraft:false})
   if(!filteredTicket){
     throw new NotFoundError('No ticket fitting this filter')
@@ -91,7 +82,6 @@ export async function getAllTickets(body:AllTicketsRequest):Promise<AllTicketsRe
  return{
     allTickets:allTickets,
     filteredTickets: filteredTicket,
-    ticketDrafts: ticketDrafts,
     totalPages:totalPages,
  }
 

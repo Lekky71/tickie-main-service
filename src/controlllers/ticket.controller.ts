@@ -7,12 +7,12 @@ import * as ResponseManager from '../helpers/response.manager'
 export async function handleCreateTicket(req:IExpressRequest,res:ExpressResponse):Promise<void>{
   const user = req.userId!
   const {eventId} = req.params
-  const event = eventId
-  const {name,description,price,type,total,available,isDraft} = req.body
+  const {name,description,price,type,total,available} = req.body
+  const image = req.file!
 
   try{
 
-    const ticket = await ticketService.createTicket({user,name,event,description,price,type,total,available,isDraft})
+    const ticket = await ticketService.createTicket({user,name,event:eventId,image,description,price,type,total,available})
 
     ResponseManager.success(res,{ticket})
 
@@ -27,13 +27,15 @@ export async function handleCreateTicket(req:IExpressRequest,res:ExpressResponse
 export async function handleEditTicketDetails(req:IExpressRequest,res:ExpressResponse):Promise<void>{
 
   const {ticketId,eventId} = req.params!
+  const image = req.file!
+
 
 
   const user = req.userId!
-  const {name,description,price,type,total,available,isDraft} = req.body
+  const {name,description,price,type,total,available} = req.body
 
   try{
-    const editedTicket = await ticketService.editTicketDetails({name,event:eventId,description,price,type,total,available,ticket:ticketId,user,isDraft})
+    const editedTicket = await ticketService.editTicketDetails({name,event:eventId,description,price,type,total,available,ticket:ticketId,user,image})
     ResponseManager.success(res,{editedTicket})
 
   }catch(err:any){

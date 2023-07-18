@@ -5,6 +5,7 @@ export interface Ticket extends mongoose.Document {
   user:string
   event:string
   name: string;
+  image:string
   description: string;
   price: number;
   type: string;
@@ -20,20 +21,21 @@ export enum EventType {
 }
 
 
-export interface TicketRequest{
+export interface CreateTicketRequest{
   user:string;
   name: string;
+  image:any;
   event: string;
   description: string;
   price: number;
   type: string;
   total: number;
   available:number;
-  isDraft: boolean;
+
 
 }
 
-export interface UpdateTicketRequest extends TicketRequest{
+export interface UpdateTicketRequest extends CreateTicketRequest{
   ticket: string;
 }
 
@@ -41,7 +43,6 @@ export interface UpdateTicketRequest extends TicketRequest{
 export interface  AllTicketsResponse {
   allTickets : Ticket[]
   filteredTickets : Ticket[]
-  ticketDrafts: Ticket[]
   totalPages : number
 }
 
