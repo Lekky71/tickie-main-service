@@ -62,6 +62,10 @@ export interface  TicketDetailsRequest{
   ticket:string
 }
 
+export interface  DeleteTicketRequest extends TicketDetailsRequest {
+  user: string
+
+}
 
 export interface  PurchaseFreeTicketRequest{
   user:string;

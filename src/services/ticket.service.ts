@@ -6,7 +6,7 @@ import {
   Ticket,
   UpdateTicketRequest,
   AllTicketsResponse,
-  AllTicketsRequest, TicketDetailsRequest, PurchaseFreeTicketRequest
+  AllTicketsRequest, TicketDetailsRequest, PurchaseFreeTicketRequest, DeleteTicketRequest, EventType
 } from '../interfaces/ticket/ticket';
 import { TransactionDb } from '../models/transaction';
 import { AssetDb } from '../models/asset';
@@ -96,7 +96,7 @@ export async function getAllTickets(body:AllTicketsRequest):Promise<AllTicketsRe
 export async function getTicketDetails(body:TicketDetailsRequest):Promise<Ticket>{
   const {ticket,event} = body
 
-  const Ticket = await TicketDb.findOne<Ticket>({id:ticket,event:event})
+  const Ticket = await TicketDb.findOne<Ticket>({_id:ticket,event:event})
   if(!Ticket){
     throw new NotFoundError('Ticket does not exist')
   }
@@ -105,11 +105,21 @@ export async function getTicketDetails(body:TicketDetailsRequest):Promise<Ticket
 
 }
 
-export async function  deleteTicket(body:TicketDetailsRequest):Promise<void>{
-  const {ticket,event} = body
+export async function  deleteTicket(body:DeleteTicketRequest):Promise<void>{
+  const {ticket,event,user} = body
 
-  await TicketDb.findOneAndDelete({id:ticket,event:event})
+  const hasBeenBought = await PurchasedTicketDb.findOne({ticket})
+  if(hasBeenBought){
+    throw new BadRequestError('Ticket cannot be deleted')
+  }
 
+  const linkedEvent = await EventDb.findById(event)
+  if(linkedEvent?.creator !== user){
+    throw new  BadRequestError('Unauthorised')
+
+  }
+
+  await TicketDb.findOneAndDelete({_id:ticket,event:event})
 
 }
 
@@ -121,40 +131,41 @@ export async function purchaseTicket(body:PurchaseFreeTicketRequest):Promise<voi
     throw new NotFoundError('User has not assets')
   }
 
-  const Ticket = await TicketDb.findOne<Ticket>({event:event,id:ticket})
-  if(!Ticket){
-    throw  new NotFoundError('This ticket does not exist')
+  const linkedTicket = await TicketDb.findById<Ticket>(ticket)
+  // I tried to access the event type after populating with {linkedTicket.event.type}
+  // but typescript kept throwing an error
+  const linkedEvent = await EventDb.findById(event)
+  if(linkedEvent!.type === EventType.FREE){
+    const transaction = await TransactionDb.create({
+      user:user,
+      asset:asset?.id,
+      symbol:'NGN',
+      status: TransactionStatus.SUCCESSFUL,
+      amount:0.00,
+      fee:0.00,
+      totalAmount:0.00,
+      clerkType:ClerkType.DEBIT,
+      type: TransactionType.PURCHASE,
+      reason: ticket,
+      description:'Ticket Purchase',
+      metadata: metadata
+    })
+    linkedTicket!.available = +linkedTicket!.available - 1
+    await linkedTicket!.save()
+
+    await PurchasedTicketDb.create({
+      ticket,
+      purchasedAt:Date.now(),
+      buyer:user,
+      email:email,
+      metadata:metadata,
+      transaction: transaction.id,
+      used:false
+
+    })
+
+
   }
-
-  Ticket!.available = +Ticket!.available - 1
-  await Ticket.save()
-
-  const transaction = await TransactionDb.create({
-    user:user,
-    asset:asset?.id,
-    symbol:'NGN',
-    status: TransactionStatus.SUCCESSFUL,
-    amount:0.00,
-    fee:0.00,
-    totalAmount:0.00,
-    clerkType:ClerkType.DEBIT,
-    type: TransactionType.PURCHASE,
-    reason: ticket,
-    description:'Ticket Purchase',
-    metadata: metadata
-  })
-
-  await PurchasedTicketDb.create({
-    ticket,
-    purchasedAt:Date.now(),
-    buyer:user,
-    email:email,
-    metadata:metadata,
-    transaction: transaction.id,
-    used:false
-
-  })
-
 
 
 }
