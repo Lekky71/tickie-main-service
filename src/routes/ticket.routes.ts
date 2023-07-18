@@ -9,7 +9,7 @@ import {
   handleDeleteTicket,
   handleEditTicketDetails,
   handleGetAllTickets,
-  handleGetTicketDetails, handlePurchaseFreeTicket
+  handleGetTicketDetails, handlePurchaseTicket
 } from '../controlllers/ticket.controller';
 
 
@@ -22,13 +22,13 @@ const jwtHelper = new JwtHelper({
 
 })
 
-// This routes are mounted to a route.use('/events/:eventId/tickets') in the events route file
+// This routes are mounted to a route.use('/events/:eventId') in the events route file
 router.post('/tickets',jwtHelper.requirePermission(JwtType.USER), handleCreateTicket)
 router.put('/tickets/:ticketId',jwtHelper.requirePermission(JwtType.USER),handleEditTicketDetails)
 router.get('/tickets?page=&limit=&filter=',jwtHelper.requirePermission(JwtType.USER),handleGetAllTickets)
 router.get('/tickets/:ticketId',jwtHelper.requirePermission(JwtType.USER),handleGetTicketDetails)
 router.delete('/tickets/:ticketId',jwtHelper.requirePermission(JwtType.USER),handleDeleteTicket)
-router.post('/tickets/:ticketId/purchase',jwtHelper.requirePermission(JwtType.USER),handlePurchaseFreeTicket)
+router.post('/tickets/:ticketId/purchase',jwtHelper.requirePermission(JwtType.USER),handlePurchaseTicket)
 
 
 export default router

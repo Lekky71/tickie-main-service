@@ -27,14 +27,13 @@ export async function handleCreateTicket(req:IExpressRequest,res:ExpressResponse
 export async function handleEditTicketDetails(req:IExpressRequest,res:ExpressResponse):Promise<void>{
 
   const {ticketId,eventId} = req.params!
-  const event = eventId
-  const ticket = ticketId
+
 
   const user = req.userId!
   const {name,description,price,type,total,available,isDraft} = req.body
 
   try{
-    const editedTicket = await ticketService.editTicketDetails({name,event,description,price,type,total,available,ticket,user,isDraft})
+    const editedTicket = await ticketService.editTicketDetails({name,event:eventId,description,price,type,total,available,ticket:ticketId,user,isDraft})
     ResponseManager.success(res,{editedTicket})
 
   }catch(err:any){
@@ -47,11 +46,10 @@ export async function handleEditTicketDetails(req:IExpressRequest,res:ExpressRes
 export async function handleGetAllTickets(req:IExpressRequest,res:ExpressResponse):Promise<void>{
   const {eventId} = req.params
   const {page,limit,filter} = req.query
-  const event = eventId
 
   try{
 
-    const tickets = await ticketService.getAllTickets({page,limit,filter,event})
+    const tickets = await ticketService.getAllTickets({page,limit,filter,event:eventId})
     ResponseManager.success(res,{tickets})
 
   }catch(err:any){
@@ -62,11 +60,9 @@ export async function handleGetAllTickets(req:IExpressRequest,res:ExpressRespons
 
 export async function handleGetTicketDetails(req:IExpressRequest,res:ExpressResponse):Promise<void>{
   const {eventId,ticketId} = req.params
-  const event = eventId
-  const ticket = ticketId
 
   try{
-    const ticketDetails = await ticketService.getTicketDetails({event,ticket})
+    const ticketDetails = await ticketService.getTicketDetails({event:eventId,ticket:ticketId})
     ResponseManager.success(res,{ticketDetails})
   }catch(err:any){
     ResponseManager.handleError(res,err)
@@ -75,13 +71,11 @@ export async function handleGetTicketDetails(req:IExpressRequest,res:ExpressResp
 
 export async function handleDeleteTicket(req:IExpressRequest,res:ExpressResponse):Promise<void>{
   const {eventId,ticketId} = req.params
-  const event = eventId
-  const ticket = ticketId
 
 
   try{
 
-    await ticketService.deleteTicket({event,ticket})
+    await ticketService.deleteTicket({event:eventId,ticket:ticketId})
 
     ResponseManager.success(res,{message:'Successfully deleted'})
 
@@ -92,16 +86,14 @@ export async function handleDeleteTicket(req:IExpressRequest,res:ExpressResponse
 }
 
 
-export async function handlePurchaseFreeTicket(req:IExpressRequest,res:ExpressResponse):Promise<void>{
+export async function handlePurchaseTicket(req:IExpressRequest,res:ExpressResponse):Promise<void>{
   const user = req.userId!
   const {eventId,ticketId} = req.params
-  const event = eventId
-  const ticket = ticketId
   const {email,metadata} = req.body
 
 
   try{
-    await ticketService.purchaseFreeTicket({user,event,ticket,email,metadata})
+    await ticketService.purchaseTicket({user,event:eventId,ticket:ticketId,email,metadata})
     ResponseManager.success(res,{message:'successfully purchased ticket'})
 
   }catch (err:any){

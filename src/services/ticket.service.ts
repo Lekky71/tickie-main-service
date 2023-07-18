@@ -118,7 +118,7 @@ export async function  deleteTicket(body:TicketDetailsRequest):Promise<void>{
 }
 
 
-export async function purchaseFreeTicket(body:PurchaseFreeTicketRequest):Promise<void>{
+export async function purchaseTicket(body:PurchaseFreeTicketRequest):Promise<void>{
   const {user,event,ticket,email,metadata} = body
   const asset = await AssetDb.findOne({user:user})
   if(!asset){
