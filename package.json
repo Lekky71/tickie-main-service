@@ -57,7 +57,7 @@
     "express-validator": "6.15.0",
     "faker": "4.1.0",
     "google-auth-library": "8.7.0",
-    "heic-convert": "^1.2.4",
+    "heic-convert": "1.2.4",
     "helmet": "3.21.2",
     "jsonwebtoken": "9.0.0",
     "log4js": "6.7.1",
