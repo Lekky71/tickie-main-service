@@ -683,13 +683,10 @@ components:
               $ref: '#/components/schemas/Event'
           example:
             {
-              "pagination": {
-                "page": 1,
-                "size": 50,
-                "lastPage": 5,
-                "totalCount": 241
-              },
-
+              "page": 1,
+              "size": 50,
+              "lastPage": 5,
+              "totalCount": 241,
               "events": [ ]
             }
 
