@@ -623,7 +623,14 @@ components:
         endDate:
           type: string
         creator:
-          type: string
+          type: object
+          properties:
+            fullName:
+              type: string
+            avatar:
+              type: string
+            id:
+              type: string
       example:
         name: Myke's Event
         creator: 827472882-28284772jwjuj2wej-23
