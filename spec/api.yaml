@@ -627,11 +627,19 @@ components:
       example:
         name: Myke's Event
         creator: 827472882-28284772jwjuj2wej-23
+
     CreateEventDto:
       type: object
       required:
         - name
         - creator
+        - description
+        - endDate
+        - date
+        - location
+        - isDraft
+        - isPublic
+        - type
       properties:
         name:
           type: string
@@ -641,6 +649,16 @@ components:
         endDate:
           type: string
         creator:
+          type: string
+        date:
+          type: string
+        location:
+          type: string
+        isDraft:
+          type: boolean
+        isPublic:
+          type: boolean
+        type:
           type: string
       example:
         name: Myke's Event
