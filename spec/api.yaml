@@ -617,6 +617,8 @@ components:
       properties:
         name:
           type: string
+        type:
+          type: string
         description:
           type: string
           format: email
@@ -631,10 +633,18 @@ components:
               type: string
             id:
               type: string
-      example:
-        name: Myke's Event
-        creator: 827472882-28284772jwjuj2wej-23
-
+      example: {
+        "name": "Myke's Event",
+        "creator": {
+          "fullName": "micheal",
+          "id": "9294iwhdwlw83",
+          "avatar": "https:example.ng/9294iwhdwlw83.jpg"
+        },
+        "description": "myke event",
+        "endDate": "2022-4-7",
+        "date": "2022-4-7",
+        "type": "PAID"
+      }
     CreateEventDto:
       type: object
       required:
