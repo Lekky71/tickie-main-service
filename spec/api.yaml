@@ -663,6 +663,11 @@ components:
       example:
         name: Myke's Event
         creator: 827472882-28284772jwjuj2wej-23
+    EventsArrayResponse:
+      type: array
+      items:
+        $ref: '#/components/schemas/Event'
+
 
     GetEventsResponse:
       title: CreateEventResponse
@@ -679,8 +684,8 @@ components:
               type: integer
             totalCount:
               type: integer
-            events:
-              $ref: '#/components/schemas/Event'
+        events:
+          $ref: '#/components/schemas/EventsArrayResponse'
           example:
             {
               "page": 1,
