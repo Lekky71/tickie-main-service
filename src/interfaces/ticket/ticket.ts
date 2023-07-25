@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import { IPagination } from '../IPagination';
 
 export interface Ticket extends mongoose.Document {
   id: string;
@@ -30,7 +31,6 @@ export interface CreateTicketRequest{
   price: number;
   type: string;
   total: number;
-  available:number;
 
 
 }
@@ -42,18 +42,13 @@ export interface UpdateTicketRequest extends CreateTicketRequest{
 
 export interface  AllTicketsResponse {
   allTickets : Ticket[]
-  pagination : {
-    page:number;
-    limit:number;
-    totalCount:number
-  }
-}
+  pagination :IPagination }
 
 export interface AllTicketsRequest{
   event:string;
   page:number;
-  limit:number;
-  filter:string;
+  size:number;
+  eventType:string;
 
 }
 

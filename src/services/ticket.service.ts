@@ -15,7 +15,7 @@ import { PurchasedTicketDb } from '../models/purchased.ticket';
 
 export async function createTicket(body:CreateTicketRequest):Promise<Ticket>{
 
-  const {user,name,event,description,price,type,total,available,image} = body
+  const {user,name,event,description,price,type,total,image} = body
 
   const linkedEvent = await EventDb.findOne({_id:event,creator:user})
   if(!linkedEvent){
@@ -31,18 +31,17 @@ export async function createTicket(body:CreateTicketRequest):Promise<Ticket>{
     price,
     type,
     total,
-    available,
   })
   return ticket as unknown as Ticket
 
 }
 
 export async function editTicketDetails(body:UpdateTicketRequest):Promise<Ticket>{
-  const {user,name,event,description,price,type,total,available,ticket,image} = body
+  const {user,name,event,description,price,type,total,ticket,image} = body
 
   const linkedEvent = await EventDb.findOne({_id:event,creator:user})
   if(!linkedEvent){
-    throw new NotFoundError('Unauthorised')
+    throw new NotFoundError('Not found')
   }
 
 
@@ -54,30 +53,29 @@ export async function editTicketDetails(body:UpdateTicketRequest):Promise<Ticket
     price,
     type,
     total,
-    available,
   })
 
-  const editedTicket = await TicketDb.findById(ticket)
-  return editedTicket as unknown as Ticket
+  const editedTicket = await TicketDb.findById<Ticket>(ticket)
+  return editedTicket!
 
 }
 
 export async function getAllTickets(body:AllTicketsRequest):Promise<AllTicketsResponse>{
   let allTickets
 
-  const {event,page,limit,filter} = body
+  const {event,page,size,eventType} = body
   const totalTickets = await TicketDb.find<Ticket>({event:event}).countDocuments()
 
-  const totalPages = Math.ceil(totalTickets/limit)
-  if(filter){
-    allTickets = await TicketDb.find<Ticket>({event: event,type:filter})
+  const totalPages = Math.ceil(totalTickets/size)
+  if(eventType){
+    allTickets = await TicketDb.find<Ticket>({event: event,type:eventType})
     if(!allTickets){
       throw new NotFoundError('No ticket fitting this filter')
     }
 
   }
 
-  allTickets = await TicketDb.find<Ticket>({event:event}).skip((page - 1) * limit).limit(limit)
+  allTickets = await TicketDb.find<Ticket>({event:event}).skip((page - 1) * size).limit(size)
   if(!allTickets){
     throw  new NotFoundError('No tickets available')
   }
@@ -86,8 +84,9 @@ export async function getAllTickets(body:AllTicketsRequest):Promise<AllTicketsRe
     allTickets:allTickets,
     pagination:{
       page:page,
-      limit:limit,
+      size:size,
       totalCount:totalPages,
+      lastPage: totalPages,
     },
  }
 

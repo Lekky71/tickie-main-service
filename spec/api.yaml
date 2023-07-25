@@ -257,14 +257,15 @@ paths:
 
 
  # API specs for endpoints related to ticket
-  /events/:eventId/tickets:
+  /events/{eventId}/tickets:
+    parameters:
+      - $ref: '#/components/parameters/EventID'
+      - $ref: '#/components/parameters/AuthToken'
     post:
       summary: 'Ticket: create Ticket'
       tags:
         - Ticket
       operationId: CreateTicket
-      parameters:
-        - $ref: '#/components/parameters/AuthToken'
       requestBody:
         content:
           application/json:
@@ -290,13 +291,12 @@ paths:
       tags:
         - Ticket
       parameters:
-        - $ref: '#/components/parameters/AuthToken'
         - name: eventType
           schema:
             type: string
           required: false
         - $ref : '#/components/parameters/Page'
-        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/Size'
       responses:
         200:
           description: 'Success'
@@ -312,14 +312,16 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
 
 
-    /events/:eventId/tickets/:ticketId:
+    /events/{eventId}/tickets/:ticketId:
+      parameters:
+        - $ref: '#/components/parameters/TicketID'
+        - $ref: '#/components/parameters/EventID'
+        - $ref: '#/components/parameters/AuthToken'
       put:
         summary: 'Ticket: update Ticket'
         tags:
           - Ticket
         operationId: UpdateTicket
-        parameters:
-          - $ref: '#/components/parameters/AuthToken'
         requestBody:
           content:
             application/json:
@@ -344,8 +346,6 @@ paths:
         summary: 'Get ticket detail'
         tags:
           - Ticket
-        parameters:
-          - $ref: '#/components/parameters/AuthToken'
         responses:
           200:
             description: 'Success'
@@ -363,8 +363,6 @@ paths:
           summary: 'Delete Ticket'
           tags:
             - Ticket
-          parameters:
-            - $ref: '#/components/parameters/AuthToken'
           responses:
             200:
               description: 'Success'
@@ -380,13 +378,15 @@ paths:
                     $ref: '#/components/schemas/ErrorResponse'
 
 
-      /events/:eventId/tickets/:ticketId/purchase:
+      /events/{eventId]/tickets/:ticketId/purchase:
         post:
           summary: 'buy a ticket'
           tags:
             - Ticket
           parameters:
             - $ref: '#/components/parameters/AuthToken'
+            - $ref: '#/components/parameters/EventID'
+            - $ref: '#/components/parameters/TicketID'
           requestBody:
             content:
               application/json:
@@ -437,8 +437,8 @@ components:
         type: number
         default: 1
       required: false
-    Limit:
-      name: limit
+    Size:
+      name: size
       in: query
       schema:
         type: number
@@ -452,6 +452,24 @@ components:
       schema:
         type: string
       required: false
+
+    EventID:
+      name: eventId
+      in: path
+      schema:
+        type: string
+        format: uuid
+      required: true
+
+    TicketID:
+      name: eventId
+      in: path
+      schema:
+        type: string
+        format: uuid
+      required: true
+
+
   responses:
     ErrorResponse401:
       description: 'Invalid JWT token'
@@ -624,25 +642,26 @@ components:
         - price
         - type
         - total
-        - available
-        - isDraft
       properties:
         name:
           type: string
+          minLength: 5
+          maxLength: 20
         event:
           type: string
+          format: uuid
         description:
           type: string
+          minLength: 30
+          maxLength: 100
         price:
-          type: string
+          type: number
+          minimum: 0.00
         type:
           type: string
         total:
-          type: string
-        available:
-          type:string
-        isDraft:
-          type: boolean
+          type: number
+          minimum: 1
 
     TicketPurchaseRequest:
       type: object
@@ -654,8 +673,9 @@ components:
           format: email
         metadata:
           type: object
-
-
+          properties:
+            name:
+              type: string
     GetTicketResponse:
       title: ticketResponse
       type: object
@@ -663,12 +683,9 @@ components:
         pagination:
           type: object
         tickets:
-          type: object[]
-
-
-
-
-
+          type: array
+          items:
+            $ref: '#/components/schemas/Ticket'
     Ticket:
       type: object
       required:
