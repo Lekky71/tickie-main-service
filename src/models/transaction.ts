@@ -80,4 +80,4 @@ const TransactionSchema = new Schema({
 });
 
 /**same name with user verification, so I change it*/
-export const TicketDb = mongoose.model(config.mongodb.collections.transactions, TransactionSchema);
+export const TransactionDb = mongoose.model(config.mongodb.collections.transactions, TransactionSchema);
