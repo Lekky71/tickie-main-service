@@ -257,7 +257,7 @@ paths:
 
 
  # API specs for endpoints related to ticket
-  /events/:eventId/tickets?page=&limit=&filter=:
+  /events/:eventId/tickets:
     post:
       summary: 'Ticket: create Ticket'
       tags:
@@ -291,6 +291,12 @@ paths:
         - Ticket
       parameters:
         - $ref: '#/components/parameters/AuthToken'
+        - name: eventType
+          schema:
+            type: string
+          required: false
+        - $ref : '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Limit'
       responses:
         200:
           description: 'Success'
@@ -424,6 +430,28 @@ components:
       schema:
         type: string
       required: true
+    Page:
+      name: page
+      in: query
+      schema:
+        type: number
+        default: 1
+      required: false
+    Limit:
+      name: limit
+      in: query
+      schema:
+        type: number
+        default: 20
+        minimum: 1
+        maximum: 30
+      required: false
+    EventType:
+      name: eventType
+      in: query
+      schema:
+        type: string
+      required: false
   responses:
     ErrorResponse401:
       description: 'Invalid JWT token'
