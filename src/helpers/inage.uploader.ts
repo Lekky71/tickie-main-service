@@ -77,7 +77,7 @@ export const multerUpload = multer({
   fileFilter,
   storage: multerS3({
     s3: s3,
-    bucket: 'gowagr-staging-assets',
+    bucket: 'tickie-staging-assets',
     acl: 'public-read',
     contentType: multerS3.AUTO_CONTENT_TYPE,
     // @ts-ignore

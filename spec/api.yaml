@@ -401,6 +401,160 @@ paths:
               schema:
                 $ref: '#/components/schemas/BadRequestResponse'
 
+ # API specs for endpoints related to ticket
+  /events/{eventId}/tickets:
+    parameters:
+      - $ref: '#/components/parameters/EventID'
+      - $ref: '#/components/parameters/AuthToken'
+    post:
+      summary: 'Ticket: create Ticket'
+      tags:
+        - Ticket
+      operationId: CreateTicket
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TicketRequest'
+        required: true
+      responses:
+        201:
+          description: 'Success'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DefaultResponse'
+        400:
+          description: "Error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    get:
+      summary: 'Get all tickets'
+      tags:
+        - Ticket
+      parameters:
+        - name: eventType
+          schema:
+            type: string
+          required: false
+        - $ref : '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Size'
+      responses:
+        200:
+          description: 'Success'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetTicketResponse'
+        404:
+          description: 'No ticket found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+
+    /events/{eventId}/tickets/:ticketId:
+      parameters:
+        - $ref: '#/components/parameters/TicketID'
+        - $ref: '#/components/parameters/EventID'
+        - $ref: '#/components/parameters/AuthToken'
+      put:
+        summary: 'Ticket: update Ticket'
+        tags:
+          - Ticket
+        operationId: UpdateTicket
+        requestBody:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TicketRequest'
+          required: true
+        responses:
+          200:
+            description: 'Success'
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/DefaultResponse'
+          400:
+            description: "Error"
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorResponse'
+
+      get:
+        summary: 'Get ticket detail'
+        tags:
+          - Ticket
+        responses:
+          200:
+            description: 'Success'
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Ticket'
+          404:
+            description: 'Ticket not found'
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorResponse'
+        delete:
+          summary: 'Delete Ticket'
+          tags:
+            - Ticket
+          responses:
+            200:
+              description: 'Success'
+              content:
+                application/json:
+                  schema:
+                   $ref: '#/components/schemas/DefaultResponse'
+            401:
+              description: 'Unauthorized'
+              content:
+                application/json:
+                  schema:
+                    $ref: '#/components/schemas/ErrorResponse'
+
+
+      /events/{eventId]/tickets/:ticketId/purchase:
+        post:
+          summary: 'buy a ticket'
+          tags:
+            - Ticket
+          parameters:
+            - $ref: '#/components/parameters/AuthToken'
+            - $ref: '#/components/parameters/EventID'
+            - $ref: '#/components/parameters/TicketID'
+          requestBody:
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/TicketPurchaseRequest'
+              required: true
+          responses:
+            200:
+              description: "Successfully purchased tickets"
+              content:
+                application/json:
+                  schema:
+                    $ref: '#/components/schemas/DefaultResponse'
+            400:
+              description: "error in purchase"
+              content:
+                application/json:
+                  schema:
+                    $ref : '#/components/schemas/ErrorResponse'
+
+
+
+
 components:
   parameters:
     UserID:
@@ -428,6 +582,46 @@ components:
       schema:
         type: string
       required: true
+    Page:
+      name: page
+      in: query
+      schema:
+        type: number
+        default: 1
+      required: false
+    Size:
+      name: size
+      in: query
+      schema:
+        type: number
+        default: 20
+        minimum: 1
+        maximum: 30
+      required: false
+    EventType:
+      name: eventType
+      in: query
+      schema:
+        type: string
+      required: false
+
+    EventID:
+      name: eventId
+      in: path
+      schema:
+        type: string
+        format: uuid
+      required: true
+
+    TicketID:
+      name: eventId
+      in: path
+      schema:
+        type: string
+        format: uuid
+      required: true
+
+
   responses:
     ErrorResponse401:
       description: 'Invalid JWT token'
@@ -708,4 +902,91 @@ components:
               "totalCount": 241,
               "events": [ ]
             }
+
+    #Ticket related schemas
+
+    TicketRequest:
+      type: object
+      required:
+        - name
+        - event
+        - description
+        - price
+        - type
+        - total
+      properties:
+        name:
+          type: string
+          minLength: 5
+          maxLength: 20
+        event:
+          type: string
+          format: uuid
+        description:
+          type: string
+          minLength: 30
+          maxLength: 100
+        price:
+          type: number
+          minimum: 0.00
+        type:
+          type: string
+        total:
+          type: number
+          minimum: 1
+
+    TicketPurchaseRequest:
+      type: object
+      required:
+        - email
+      properties:
+        email:
+          type: string
+          format: email
+        metadata:
+          type: object
+          properties:
+            name:
+              type: string
+    GetTicketResponse:
+      title: ticketResponse
+      type: object
+      properties:
+        pagination:
+          type: object
+        tickets:
+          type: array
+          items:
+            $ref: '#/components/schemas/Ticket'
+    Ticket:
+      type: object
+      required:
+        - id
+        - name
+        - event
+        - description
+        - price
+        - type
+        - total
+        - available
+        - isDraft
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        event:
+          type: string
+        description:
+          type: string
+        price:
+          type: number
+        type:
+          type: string
+        total:
+          type: number
+        available:
+          type: number
+        isDraft:
+          type:boolean
 
