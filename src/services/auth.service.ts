@@ -242,7 +242,7 @@ export async function verifyLoginDeviceOtp(body: {
 export async function googleAuth(body: {
   email: string;
   googleToken: string;
-  deviceId: string
+  deviceId: string;
 }): Promise<SignUpResponse> {
   const { googleToken, deviceId } = body;
   /**pull it off separately, so I can change it to lowercase */

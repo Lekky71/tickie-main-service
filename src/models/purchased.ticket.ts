@@ -3,7 +3,7 @@ import { Schema, } from 'mongoose';
 import { config } from '../constants/settings';
 import { v4 as uuidv4 } from 'uuid';
 
-const TicketSchema = new Schema({
+const PurchasedTicketSchema = new Schema({
   _id: {
     type: String, default: function genUUID() {
       return uuidv4();
@@ -58,4 +58,4 @@ const TicketSchema = new Schema({
 });
 
 /**same name with user verification, so I change it*/
-export const PurchasedTicket = mongoose.model(config.mongodb.collections.purchased_tickets, TicketSchema);
+export const PurchasedTicketDb = mongoose.model(config.mongodb.collections.purchased_tickets, PurchasedTicketSchema);
