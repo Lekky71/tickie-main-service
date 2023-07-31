@@ -297,13 +297,13 @@ paths:
                 $ref: '#/components/schemas/BadRequestResponse'
 
   /events/{eventId}:
+    parameters:
+      - $ref: '#/components/parameters/AuthToken'
+      - $ref: '#/components/parameters/EventID'
     put:
       summary: 'Edit Already existing events by the creator'
       tags:
         - Events
-      parameters:
-        - $ref: '#/components/parameters/AuthToken'
-        - $ref: '#/components/parameters/EventID'
       operationId: EditEvents
 
       requestBody:
@@ -328,9 +328,6 @@ paths:
       summary: 'Delete Already existing events by only the creator'
       tags:
         - Events
-      parameters:
-        - $ref: '#/components/parameters/AuthToken'
-        - $ref: '#/components/parameters/EventID'
       operationId: DeleteEvents
       responses:
         200:
