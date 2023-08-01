@@ -856,10 +856,10 @@ components:
           maxLength: 100
         isDraft:
           type: boolean
-          default: false
+          default: true
         isPublic:
           type: boolean
-          default: true
+          default: false
         type:
           type: string
         coverImage:
