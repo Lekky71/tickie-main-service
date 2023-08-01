@@ -437,6 +437,7 @@ paths:
         - Ticket
       parameters:
         - name: eventType
+          in: query
           schema:
             type: string
           required: false
@@ -457,100 +458,99 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
 
 
-    /events/{eventId}/tickets/:ticketId:
-      parameters:
-        - $ref: '#/components/parameters/TicketID'
-        - $ref: '#/components/parameters/EventID'
-        - $ref: '#/components/parameters/AuthToken'
-      put:
-        summary: 'Ticket: update Ticket'
-        tags:
-          - Ticket
-        operationId: UpdateTicket
-        requestBody:
+  /events/{eventId}/tickets/:ticketId:
+    parameters:
+      - $ref: '#/components/parameters/TicketID'
+      - $ref: '#/components/parameters/EventID'
+      - $ref: '#/components/parameters/AuthToken'
+    put:
+      summary: 'Ticket: update Ticket'
+      tags:
+        - Ticket
+      operationId: UpdateTicket
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TicketRequest'
+        required: true
+      responses:
+        200:
+          description: 'Success'
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TicketRequest'
-          required: true
-        responses:
-          200:
-            description: 'Success'
-            content:
-              application/json:
-                schema:
-                  $ref: '#/components/schemas/DefaultResponse'
-          400:
-            description: "Error"
-            content:
-              application/json:
-                schema:
-                  $ref: '#/components/schemas/ErrorResponse'
+                $ref: '#/components/schemas/DefaultResponse'
+        400:
+          description: "Error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 
-      get:
-        summary: 'Get ticket detail'
-        tags:
-          - Ticket
-        responses:
-          200:
-            description: 'Success'
-            content:
-              application/json:
-                schema:
-                  $ref: '#/components/schemas/Ticket'
-          404:
-            description: 'Ticket not found'
-            content:
-              application/json:
-                schema:
-                  $ref: '#/components/schemas/ErrorResponse'
-        delete:
-          summary: 'Delete Ticket'
-          tags:
-            - Ticket
-          responses:
-            200:
-              description: 'Success'
-              content:
-                application/json:
-                  schema:
-                    $ref: '#/components/schemas/DefaultResponse'
-            401:
-              description: 'Unauthorized'
-              content:
-                application/json:
-                  schema:
-                    $ref: '#/components/schemas/ErrorResponse'
+    get:
+      summary: 'Get ticket detail'
+      tags:
+        - Ticket
+      responses:
+        200:
+          description: 'Success'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ticket'
+        404:
+          description: 'Ticket not found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      summary: 'Delete Ticket'
+      tags:
+        - Ticket
+      responses:
+        200:
+          description: 'Success'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DefaultResponse'
+        401:
+          description: 'Unauthorized'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 
 
-      /events/{eventId]/tickets/:ticketId/purchase:
-        post:
-          summary: 'buy a ticket'
-          tags:
-            - Ticket
-          parameters:
-            - $ref: '#/components/parameters/AuthToken'
-            - $ref: '#/components/parameters/EventID'
-            - $ref: '#/components/parameters/TicketID'
-          requestBody:
-            content:
-              application/json:
-                schema:
-                  $ref: '#/components/schemas/TicketPurchaseRequest'
-              required: true
-          responses:
-            200:
-              description: "Successfully purchased tickets"
-              content:
-                application/json:
-                  schema:
-                    $ref: '#/components/schemas/DefaultResponse'
-            400:
-              description: "error in purchase"
-              content:
-                application/json:
-                  schema:
-                    $ref: '#/components/schemas/ErrorResponse'
+  /events/{eventId}/tickets/{ticketId}/purchase:
+    post:
+      summary: 'buy a ticket'
+      tags:
+        - Ticket
+      parameters:
+        - $ref: '#/components/parameters/AuthToken'
+        - $ref: '#/components/parameters/EventID'
+        - $ref: '#/components/parameters/TicketID'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TicketPurchaseRequest'
+      responses:
+        200:
+          description: "Successfully purchased tickets"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DefaultResponse'
+        400:
+          description: "error in purchase"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 
 
 
@@ -607,7 +607,7 @@ components:
       required: true
 
     TicketID:
-      name: eventId
+      name: ticketId
       in: path
       schema:
         type: string
@@ -872,32 +872,34 @@ components:
       items:
         $ref: '#/components/schemas/Event'
 
+    Pagination:
+      type: object
+      example:
+        {
+          "page": 1,
+          "size": 50,
+          "lastPage": 5,
+          "totalCount": 241,
+          "events": [ ]
+        }
+      properties:
+        page:
+          type: integer
+        size:
+          type: integer
+        lastPage:
+          type: integer
+        totalCount:
+          type: integer
 
     GetEventsResponse:
       title: CreateEventResponse
       type: object
       properties:
         pagination:
-          type: object
-          properties:
-            page:
-              type: integer
-            size:
-              type: integer
-            lastPage:
-              type: integer
-            totalCount:
-              type: integer
+          $ref: '#/components/schemas/Pagination'
         events:
           $ref: '#/components/schemas/EventsArrayResponse'
-          example:
-            {
-              "page": 1,
-              "size": 50,
-              "lastPage": 5,
-              "totalCount": 241,
-              "events": [ ]
-            }
 
     #Ticket related schemas
 
@@ -949,7 +951,7 @@ components:
       type: object
       properties:
         pagination:
-          type: object
+          $ref: '#/components/schemas/Pagination'
         tickets:
           type: array
           items:

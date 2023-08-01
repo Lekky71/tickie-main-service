@@ -22,16 +22,16 @@ const jwtHelper = new JwtHelper({
 const router: Router = Router();
 
 
-router.get('/', jwtHelper.requirePermission(JwtType.USER), handleGetMyEvents)
+router.get('/', jwtHelper.requirePermission(JwtType.USER), handleGetMyEvents);
 
-router.post('/', jwtHelper.requirePermission(JwtType.USER), handleCreateEvent)
+router.post('/', jwtHelper.requirePermission(JwtType.USER), handleCreateEvent);
 
-router.get('/:eventId', jwtHelper.requirePermission(JwtType.USER), handleGetOneEvent)
+router.get('/:eventId', jwtHelper.requirePermission(JwtType.USER), handleGetOneEvent);
 
-router.delete('/:eventId', jwtHelper.requirePermission(JwtType.USER), handleDeleteEvent)
+router.delete('/:eventId', jwtHelper.requirePermission(JwtType.USER), handleDeleteEvent);
 
-router.put('/:eventId', jwtHelper.requirePermission(JwtType.USER), handleUpdateEvent)
+router.put('/:eventId', jwtHelper.requirePermission(JwtType.USER), handleUpdateEvent);
 
-router.get('/explore', EventController.handleGetEvents)
+router.get('/explore', EventController.handleGetEvents);
 
-export const EventRouter = router
+export const EventRouter = router;
