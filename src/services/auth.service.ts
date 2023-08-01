@@ -366,6 +366,7 @@ export async function verifyForgotPasswordOtpRequest(body: ForgotPasswordOtpVeri
     email,
     otp,
     deviceId,
+    type: OtpType.FORGOT_PASSWORD
   });
 
   if (!verDb) {
