@@ -27,3 +27,10 @@ export class NotFoundError extends CustomError {
     this.name = 'NotFoundError';
   }
 }
+
+export class ServiceUnavailableError extends CustomError {
+  constructor(msg?: string) {
+    super(503, msg || 'ServiceUnavailableError');
+    this.name = 'ServiceUnavailableError';
+  }
+}
