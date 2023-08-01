@@ -24,7 +24,7 @@ const EventSchema = new Schema<IEventDocument, IEventModel>({
     required: true,
   },
   date: {
-    type: String,
+    type: Date,
     required: true,
   },
   creator: {
@@ -34,7 +34,7 @@ const EventSchema = new Schema<IEventDocument, IEventModel>({
     ref: config.mongodb.collections.users,
   },
   endDate: {
-    type: String,
+    type: Date,
     required: false,
   },
   type: {

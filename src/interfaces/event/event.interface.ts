@@ -5,9 +5,9 @@ export interface IEventDocument extends Document {
   name: string;
   coverImage: string;
   description: string;
-  date: string;
+  date: Date;
   creator: string;
-  endDate: string
+  endDate: Date;
   type: string;
   isPublic: boolean;
   location: string;
