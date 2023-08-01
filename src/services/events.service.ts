@@ -4,6 +4,7 @@ import { CreateEvent, EditEvent, IEventDocument } from '../interfaces/event/even
 
 
 export async function createEvent(body: CreateEvent): Promise<IEventDocument> {
+  /**I don't really get the validations you asked me to do boss*/
   return await EventDb.create(body)
 }
 
@@ -43,12 +44,13 @@ export async function getOneEvent(eventId: string): Promise<IEventDocument> {
 
 /**This will be work in progress*/
 export async function updateEvent(filter: { _id: string, creator: string }, body: EditEvent): Promise<IEventDocument> {
-  const updatedEvent = await EventDb.findByIdAndUpdate<IEventDocument>(filter, body, { new: true })
+  /**I'm not really sure, if a field is undefined or null, mongoose don't bother try updating the filed*/
+  const updatedEvent = await EventDb.findByIdAndUpdate<IEventDocument>(filter, body, { new: true });
   if (!updatedEvent) {
     throw new NotFoundError('no event found with the provided id')
   }
 
-  return updatedEvent
+  return updatedEvent;
 }
 
 /**This will be work in progress*/

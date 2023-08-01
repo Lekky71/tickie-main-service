@@ -5,11 +5,12 @@ import * as ResponseManager from '../helpers/response.manager';
 
 
 export async function handleCreateEvent(req: IExpressRequest, res: Response): Promise<void> {
+  req.body.creator = <string>req.userId;
+  const { name, description, creator, location, type, isDraft, date, endDate, isPublic, coverImage } = req.body;
+  const image = req.file!
   try {
-    req.body.creator = <string>req.userId;
-    const { name, description, creator, location, type, isDraft, date, endDate, isPublic } = req.body
     const response = await EventService.createEvent(
-      { name, description, creator, location, type, isDraft, date, endDate, isPublic })
+      { name, description, creator, location, type, isDraft, date, endDate, isPublic, coverImage })
     return ResponseManager.success(res, response);
   } catch (error: unknown) {
     ResponseManager.handleError(res, error)

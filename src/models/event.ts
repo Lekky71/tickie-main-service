@@ -11,6 +11,10 @@ const EventSchema = new Schema<IEventDocument, IEventModel>({
       return uuidv4();
     }
   },
+  coverImage: {
+    type: String,
+    required: true
+  },
   name: {
     type: String,
     required: true,
@@ -20,7 +24,7 @@ const EventSchema = new Schema<IEventDocument, IEventModel>({
     required: true,
   },
   date: {
-    type: Date,
+    type: String,
     required: true,
   },
   creator: {
@@ -30,7 +34,7 @@ const EventSchema = new Schema<IEventDocument, IEventModel>({
     ref: config.mongodb.collections.users,
   },
   endDate: {
-    type: Date,
+    type: String,
     required: false,
   },
   type: {

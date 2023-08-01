@@ -401,7 +401,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/BadRequestResponse'
 
- # API specs for endpoints related to ticket
+  # API specs for endpoints related to ticket
   /events/{eventId}/tickets:
     parameters:
       - $ref: '#/components/parameters/EventID'
@@ -440,7 +440,7 @@ paths:
           schema:
             type: string
           required: false
-        - $ref : '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Page'
         - $ref: '#/components/parameters/Size'
       responses:
         200:
@@ -514,7 +514,7 @@ paths:
               content:
                 application/json:
                   schema:
-                   $ref: '#/components/schemas/DefaultResponse'
+                    $ref: '#/components/schemas/DefaultResponse'
             401:
               description: 'Unauthorized'
               content:
@@ -550,7 +550,7 @@ paths:
               content:
                 application/json:
                   schema:
-                    $ref : '#/components/schemas/ErrorResponse'
+                    $ref: '#/components/schemas/ErrorResponse'
 
 
 
@@ -563,13 +563,6 @@ components:
       schema:
         type: string
       required: true
-    EventID:
-      name: eventId
-      in: path
-      schema:
-        type: string
-      required: true
-      description: unique ID of the event to get
     AuthToken:
       name: x-auth-token
       in: header
@@ -816,20 +809,14 @@ components:
         endDate:
           type: string
         creator:
-          type: object
-          properties:
-            fullName:
-              type: string
-            avatar:
-              type: string
-            id:
-              type: string
+          $ref: '#/components/schemas/PublicUser'
       example: {
+        "coverImage": "https://example.coo/event-c2548bbf-1fd4-492a-9d25-988234880980.jpg",
         "name": "Myke's Event",
         "creator": {
-          "fullName": "micheal",
-          "id": "9294iwhdwlw83",
-          "avatar": "https:example.ng/9294iwhdwlw83.jpg"
+          "id": "c2548bbf-1fd4-492a-9d25-988234880980",
+          "fullName": "Myke Awoniran",
+          "avatar": "https://example.coo/event-c2548bbf-1fd4-492a-9d25-988234880980.jpg"
         },
         "description": "myke event",
         "endDate": "2022-4-7",
@@ -837,6 +824,7 @@ components:
         "type": "PAID"
       }
     CreateEventDto:
+      additionalProperties: false
       type: object
       required:
         - name
@@ -848,25 +836,33 @@ components:
         - isDraft
         - isPublic
         - type
+        - coverImage
       properties:
         name:
           type: string
         description:
           type: string
-          format: email
+          minLength: 20
+          maxLength: 100
         endDate:
           type: string
         creator:
           type: string
         date:
-          type: string
+          type: number
         location:
           type: string
+          minLength: 20
+          maxLength: 100
         isDraft:
           type: boolean
+          default: false
         isPublic:
           type: boolean
+          default: true
         type:
+          type: string
+        coverImage:
           type: string
       example:
         name: Myke's Event
@@ -988,5 +984,19 @@ components:
         available:
           type: number
         isDraft:
-          type:boolean
+          type: boolean
+
+    PublicUser:
+      type: object
+      required:
+        - id
+        - fullName
+        - avatar
+      properties:
+        id:
+          type: string
+        fullName:
+          type: string
+        avatar:
+          type: string
 

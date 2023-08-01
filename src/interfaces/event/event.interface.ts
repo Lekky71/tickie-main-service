@@ -3,10 +3,11 @@ import { Document, Model } from 'mongoose';
 export interface IEventDocument extends Document {
   _id?: string;
   name: string;
+  coverImage: string;
   description: string;
-  date: Date;
+  date: string;
   creator: string;
-  endDate: Date | undefined;
+  endDate: string
   type: string;
   isPublic: boolean;
   location: string;
@@ -16,10 +17,11 @@ export interface IEventDocument extends Document {
 export interface CreateEvent {
   name: string;
   description: string;
-  date: Date;
+  date: string;
   creator: string;
-  endDate: Date | undefined;
+  endDate: string;
   type: string;
+  coverImage?: any;
   isPublic: boolean;
   location: string;
   isDraft: boolean;
