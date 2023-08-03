@@ -18,6 +18,7 @@ export enum OtpType {
 }
 
 export enum JwtType {
+  GUEST_OR_USER = 'GUEST_OR_USER',
   NEW_USER = 'NEW_USER',
   USER = 'USER',
   TRANSACTING_USER = 'TRANSACTING_USER',

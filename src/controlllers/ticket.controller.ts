@@ -11,7 +11,6 @@ export async function handleCreateTicket(req: IExpressRequest, res: ExpressRespo
   const image = req.file!;
 
   try {
-
     const ticket = await ticketService.createTicket({
       user,
       name,
@@ -43,7 +42,7 @@ export async function handleEditTicketDetails(req:IExpressRequest,res:ExpressRes
   const { name, description, price, type, total } = req.body;
 
   try {
-    const editedTicket = await ticketService.editTicketDetails({
+    await ticketService.editTicketDetails({
       name,
       event: eventId,
       description,
@@ -54,7 +53,7 @@ export async function handleEditTicketDetails(req:IExpressRequest,res:ExpressRes
       user,
       image
     });
-    ResponseManager.success(res, { editedTicket });
+    ResponseManager.success(res, { message: 'Successfully edited ticket' });
 
   } catch (err: any) {
     ResponseManager.handleError(res, err);
@@ -111,7 +110,6 @@ export async function handlePurchaseTicket(req:IExpressRequest,res:ExpressRespon
   const user = req.userId!;
   const { eventId, ticketId } = req.params;
   const { email, metadata } = req.body;
-
 
   try {
     await ticketService.purchaseTicket({ user, event: eventId, ticket: ticketId, email, metadata });
