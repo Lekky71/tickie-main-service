@@ -19,8 +19,8 @@ export interface CreateEvent {
   description: string;
   date: string;
   creator: string;
-  endDate: string;
-  type: string;
+  endDate: number;
+  type: number;
   coverImage?: any;
   isPublic: boolean;
   location: string;

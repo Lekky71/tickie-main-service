@@ -9,6 +9,7 @@ export async function handleCreateEvent(req: IExpressRequest, res: Response): Pr
   const { name, description, creator, location, type, isDraft, date, endDate, isPublic, coverImage } = req.body;
   const image = req.file!;
   try {
+    // Validate dates
     const response = await EventService.createEvent(
       { name, description, creator, location, type, isDraft, date, endDate, isPublic, coverImage });
     return ResponseManager.success(res, response);
