@@ -10,9 +10,6 @@
     "dev:watch": "nodemon ./src/bin/www/index.ts",
     "build": "webpack",
     "test": "jest",
-    "test:e2e": "npm run test:signup:e2e && npm run test:user:e2e",
-    "test:signup:e2e": "jest --collectCoverage=false ./src/test/auth/signup.e2e.spec.ts",
-    "test:user:e2e": "jest --collectCoverage=false ./src/test/auth/user.e2e.spec.ts",
     "test:watch": "jest --watchAll --collectCoverage=false",
     "test:vulnerability": "npm audit",
     "prettier:watch": "onchange './src/**/*.ts' -- prettier --write {{changed}}",
@@ -43,7 +40,7 @@
   },
   "homepage": "https://github.com/Lekky71/nodejs-api-typescript-template.git#readme",
   "dependencies": {
-    "@aws-sdk/client-s3": "3.383.0",
+    "@aws-sdk/client-s3": "^3.383.0",
     "@types/jsonwebtoken": "9.0.1",
     "@types/randomstring": "1.1.8",
     "aws-sdk": "2.1368.0",
@@ -77,13 +74,12 @@
     "randomstring": "1.2.3",
     "redis": "4.6.5",
     "request-debug": "0.2.0",
-    "sharp": "0.32.1",
+    "sharp": "^0.32.1",
     "swagger-jsdoc": "6.2.8",
     "swagger-ui-express": "4.6.2",
     "uuid": "9.0.0"
   },
   "devDependencies": {
-    "@faker-js/faker": "8.0.2",
     "@types/body-parser": "1.17.1",
     "@types/compression": "1.0.1",
     "@types/config": "0.0.36",
