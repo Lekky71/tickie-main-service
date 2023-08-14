@@ -28,7 +28,7 @@ const TicketSchema = new Schema({
     required: false,
   },
   price: {
-    type: Schema.Types.Decimal128,
+    type: Number,
     required: true,
     default: 0.00,
   },

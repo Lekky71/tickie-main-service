@@ -68,6 +68,15 @@ export class JwtHelper {
   requirePermission(roleType: JwtType) {
     return async (req: IExpressRequest, res: Response, next: Function) => {
       const token = req.headers['x-auth-token'];
+
+      // If guest is allowed, then check if token is present
+      // If token is present, then make the roleType USER so that we can validate.
+      if ((typeof token !== 'string') && roleType === JwtType.GUEST_OR_USER) {
+        return next();
+      } else if (token && roleType === JwtType.GUEST_OR_USER) {
+        roleType = JwtType.USER;
+      }
+
       if (!token) {
         return this.respondError(res, 403, 'No API token');
       }

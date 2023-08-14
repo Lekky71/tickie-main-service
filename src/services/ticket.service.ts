@@ -1,27 +1,26 @@
-import {TicketDb} from '../models/ticket';
-import {EventDb} from '../models/event';
-import {BadRequestError,NotFoundError} from '../interfaces';
+import { TicketDb, EventDb } from '../models';
+import { BadRequestError, NotFoundError } from '../interfaces';
 import {
-  CreateTicketRequest,
-  Ticket,
-  UpdateTicketRequest,
+  AllTicketsRequest,
   AllTicketsResponse,
-  AllTicketsRequest, TicketDetailsRequest, PurchaseFreeTicketRequest, DeleteTicketRequest, EventType
+  CreateTicketRequest,
+  DeleteTicketRequest,
+  EventType,
+  PurchaseFreeTicketRequest,
+  Ticket,
+  TicketDetailsRequest,
+  UpdateTicketRequest
 } from '../interfaces/ticket/ticket';
-import { TransactionDb } from '../models/transaction';
-import { AssetDb } from '../models/asset';
-import { ClerkType, TransactionStatus, TransactionType } from '../interfaces/wallet/transaction';
 import { PurchasedTicketDb } from '../models/purchased.ticket';
 
-export async function createTicket(body:CreateTicketRequest):Promise<Ticket>{
+export async function createTicket(body: CreateTicketRequest): Promise<Ticket> {
 
   const { user, name, event, description, price, type, total, image } = body;
 
   const linkedEvent = await EventDb.findOne({ _id: event, creator: user });
-  if(!linkedEvent){
+  if (!linkedEvent) {
     throw new NotFoundError('Unauthorised');
   }
-
 
   const ticket = await TicketDb.create({
     name,
@@ -31,21 +30,23 @@ export async function createTicket(body:CreateTicketRequest):Promise<Ticket>{
     price,
     type,
     total,
+    available: total,
   });
-  return ticket as unknown as Ticket;
+
+
+  return (await TicketDb.findById<Ticket>(ticket.id))!.toObject();
 
 }
 
-export async function editTicketDetails(body:UpdateTicketRequest):Promise<Ticket>{
+export async function editTicketDetails(body: UpdateTicketRequest): Promise<void> {
   const { user, name, event, description, price, type, total, ticket, image } = body;
 
   const linkedEvent = await EventDb.findOne({ _id: event, creator: user });
-  if(!linkedEvent){
+  if (!linkedEvent) {
     throw new NotFoundError('Not found');
   }
 
-
-  await TicketDb.updateOne({ id: ticket }, {
+  await TicketDb.updateOne({ _id: ticket }, {
     name,
     image,
     event,
@@ -54,13 +55,10 @@ export async function editTicketDetails(body:UpdateTicketRequest):Promise<Ticket
     type,
     total,
   });
-
-  const editedTicket = await TicketDb.findById<Ticket>(ticket);
-  return editedTicket!;
-
+  return;
 }
 
-export async function getAllTickets(body:AllTicketsRequest):Promise<AllTicketsResponse> {
+export async function getAllTickets(body: AllTicketsRequest): Promise<AllTicketsResponse> {
   let allTickets;
 
   const { event, page, size, eventType } = body;
@@ -76,7 +74,7 @@ export async function getAllTickets(body:AllTicketsRequest):Promise<AllTicketsRe
   }
 
   allTickets = await TicketDb.find<Ticket>({ event: event }).skip((page - 1) * size).limit(size);
-  if(!allTickets){
+  if (!allTickets) {
     throw  new NotFoundError('No tickets available');
   }
 
@@ -85,18 +83,18 @@ export async function getAllTickets(body:AllTicketsRequest):Promise<AllTicketsRe
     pagination: {
       page: page,
       size: size,
-      totalCount: totalPages,
+      totalCount: totalTickets,
       lastPage: totalPages,
     },
   };
 
 }
 
-export async function getTicketDetails(body:TicketDetailsRequest):Promise<Ticket>{
+export async function getTicketDetails(body: TicketDetailsRequest): Promise<Ticket> {
   const { ticket, event } = body;
 
   const Ticket = await TicketDb.findOne<Ticket>({ _id: ticket, event: event });
-  if(!Ticket){
+  if (!Ticket) {
     throw new NotFoundError('Ticket does not exist');
   }
 
@@ -104,16 +102,16 @@ export async function getTicketDetails(body:TicketDetailsRequest):Promise<Ticket
 
 }
 
-export async function  deleteTicket(body:DeleteTicketRequest):Promise<void>{
+export async function deleteTicket(body: DeleteTicketRequest): Promise<void> {
   const { ticket, event, user } = body;
 
   const hasBeenBought = await PurchasedTicketDb.findOne({ ticket });
-  if(hasBeenBought){
+  if (hasBeenBought) {
     throw new BadRequestError('Ticket cannot be deleted');
   }
 
   const linkedEvent = await EventDb.findById(event);
-  if(linkedEvent?.creator !== user){
+  if (linkedEvent?.creator !== user) {
     throw new BadRequestError('Unauthorised');
 
   }
@@ -123,32 +121,22 @@ export async function  deleteTicket(body:DeleteTicketRequest):Promise<void>{
 }
 
 
-export async function purchaseTicket(body:PurchaseFreeTicketRequest):Promise<void> {
+export async function purchaseTicket(body: PurchaseFreeTicketRequest): Promise<void> {
   const { user, event, ticket, email, metadata } = body;
-  const asset = await AssetDb.findOne({ user: user });
-  if (!asset) {
-    throw new NotFoundError('User has not assets');
-  }
 
   const linkedTicket = await TicketDb.findById<Ticket>(ticket);
   // I tried to access the event type after populating with {linkedTicket.event.type}
   // but typescript kept throwing an error
   const linkedEvent = await EventDb.findById(event);
-  if (linkedEvent!.type === EventType.FREE) {
-    const transaction = await TransactionDb.create({
-      user:user,
-      asset:asset?.id,
-      symbol: 'NGN',
-      status: TransactionStatus.SUCCESSFUL,
-      amount: 0.00,
-      fee: 0.00,
-      totalAmount: 0.00,
-      clerkType: ClerkType.DEBIT,
-      type: TransactionType.PURCHASE,
-      reason: ticket,
-      description: 'Ticket Purchase',
-      metadata: metadata
-    });
+  if (!linkedTicket) {
+    throw new NotFoundError('Ticket does not exist');
+  }
+
+  if (!linkedEvent) {
+    throw new NotFoundError('Event does not exist');
+  }
+
+  if (linkedEvent.type === EventType.FREE) {
     linkedTicket!.available = +linkedTicket!.available - 1;
     await linkedTicket!.save();
 
@@ -158,13 +146,9 @@ export async function purchaseTicket(body:PurchaseFreeTicketRequest):Promise<voi
       buyer: user,
       email: email,
       metadata: metadata,
-      transaction: transaction.id,
+      // transaction: , FREE
       used: false
 
     });
-
-
   }
-
-
 }

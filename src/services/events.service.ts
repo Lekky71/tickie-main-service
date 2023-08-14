@@ -14,7 +14,10 @@ export async function getAllEvents(body: { page: number, size: number, search: s
   events: IEventDocument[]
 }> {
   const { search, page, size } = body;
-  const query = { fullName: { $regex: search, $options: 'i' } };
+  let query = {};
+  if (search) {
+    query = { name: { $regex: search, $options: 'i' } };
+  }
   const count = await EventDb.countDocuments(query);
   const events = await EventDb.find<IEventDocument>(query)
     .skip((page - 1) * size)
@@ -64,5 +67,5 @@ export async function deleteEvent(filter: { _id: string, creator: string }): Pro
 }
 
 export function getMyEvents(userId: string): Promise<IEventDocument[]> {
-  return EventDb.find({ _id: userId });
+  return EventDb.find({ creator: userId });
 }

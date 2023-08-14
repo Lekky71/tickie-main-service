@@ -263,14 +263,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Event'
+              $ref: '#/components/schemas/CreateEventDto'
       responses:
         201:
           description: 'Success'
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CreateEventDto'
+                $ref: '#/components/schemas/Event'
         400:
           description: 'Error'
           content:
@@ -310,7 +310,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Event'
+              $ref: '#/components/schemas/CreateEventDto'
       responses:
         200:
           description: 'Success'
@@ -369,24 +369,14 @@ paths:
       tags:
         - Events
       parameters:
-        - in: query
-          name: page
-          schema:
-            type: integer
-            minimum: 1
-          description: The number of items to skip before starting to collect the result set
-        - in: query
-          name: size
-          schema:
-            type: integer
-            maximum: 50
-          description: The numbers of items to return per query
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Size'
         - in: query
           name: search
           schema:
             type: string
           description: search query for filtering
-      operationId: GetEvents
+      operationId: ExploreEvents
       responses:
         200:
           description: 'Success'
@@ -530,7 +520,7 @@ paths:
       tags:
         - Ticket
       parameters:
-        - $ref: '#/components/parameters/AuthToken'
+        - $ref: '#/components/parameters/OptionalAuthToken'
         - $ref: '#/components/parameters/EventID'
         - $ref: '#/components/parameters/TicketID'
       requestBody:
@@ -569,6 +559,12 @@ components:
       schema:
         type: string
       required: true
+    OptionalAuthToken:
+      name: x-auth-token
+      in: header
+      schema:
+        type: string
+      required: false
     DeviceID:
       name: x-device-id
       in: header
@@ -580,6 +576,7 @@ components:
       in: query
       schema:
         type: number
+        minimum: 1
         default: 1
       required: false
     Size:
@@ -810,25 +807,12 @@ components:
           type: string
         creator:
           $ref: '#/components/schemas/PublicUser'
-      example: {
-        "coverImage": "https://example.coo/event-c2548bbf-1fd4-492a-9d25-988234880980.jpg",
-        "name": "Myke's Event",
-        "creator": {
-          "id": "c2548bbf-1fd4-492a-9d25-988234880980",
-          "fullName": "Myke Awoniran",
-          "avatar": "https://example.coo/event-c2548bbf-1fd4-492a-9d25-988234880980.jpg"
-        },
-        "description": "myke event",
-        "endDate": "2022-4-7",
-        "date": "2022-4-7",
-        "type": "PAID"
-      }
+
     CreateEventDto:
       additionalProperties: false
       type: object
       required:
         - name
-        - creator
         - description
         - endDate
         - date
@@ -845,9 +829,7 @@ components:
           minLength: 20
           maxLength: 100
         endDate:
-          type: string
-        creator:
-          type: string
+          type: number
         date:
           type: number
         location:
@@ -862,11 +844,13 @@ components:
           default: false
         type:
           type: string
+          enum:
+            - FREE
+            - PAID
         coverImage:
           type: string
-      example:
-        name: Myke's Event
-        creator: 827472882-28284772jwjuj2wej-23
+          format: uri
+
     EventsArrayResponse:
       type: array
       items:
@@ -907,7 +891,6 @@ components:
       type: object
       required:
         - name
-        - event
         - description
         - price
         - type
@@ -917,9 +900,6 @@ components:
           type: string
           minLength: 5
           maxLength: 20
-        event:
-          type: string
-          format: uuid
         description:
           type: string
           minLength: 30
@@ -929,6 +909,9 @@ components:
           minimum: 0.00
         type:
           type: string
+          enum:
+            - FREE
+            - PAID
         total:
           type: number
           minimum: 1

@@ -12,6 +12,7 @@ import { JwtHelper } from '../helpers/jwt.helper';
 import { config } from '../constants/settings';
 import { UserTokenDb } from '../models';
 import { redisClient } from '../helpers/redis.connector';
+import ticketRoutes from './ticket';
 
 const jwtHelper = new JwtHelper({
   privateKey: config.jwtPrivateKey,
@@ -26,12 +27,15 @@ router.get('/', jwtHelper.requirePermission(JwtType.USER), handleGetMyEvents);
 
 router.post('/', jwtHelper.requirePermission(JwtType.USER), handleCreateEvent);
 
+router.use('/:eventId/tickets', ticketRoutes);
+
+router.get('/explore', EventController.handleGetEvents);
+
 router.get('/:eventId', jwtHelper.requirePermission(JwtType.USER), handleGetOneEvent);
 
 router.delete('/:eventId', jwtHelper.requirePermission(JwtType.USER), handleDeleteEvent);
 
 router.put('/:eventId', jwtHelper.requirePermission(JwtType.USER), handleUpdateEvent);
 
-router.get('/explore', EventController.handleGetEvents);
 
 export const EventRouter = router;
