@@ -307,12 +307,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                example:
-                  { "message": "User not found" }
+                $ref: '#/components/schemas/NotFoundResponse'
 
   /user/change-password:
     put:
@@ -346,6 +341,310 @@ paths:
                 example:
                   { "message": "Your current password is wrong, you've two tries left" }
 
+  /events:
+    post:
+      summary: 'Create a new event'
+      description: 'Create new events, can also save events as drafts too'
+      tags:
+        - Events
+      parameters:
+        - $ref: '#/components/parameters/AuthToken'
+      operationId: PostEvents
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Event'
+      responses:
+        201:
+          description: 'Success'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateEventDto'
+        400:
+          description: 'Error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestResponse'
+    get:
+      summary: 'And endpoint for users to get their own events'
+      tags:
+        - Events
+      operationId: GetEvents
+      responses:
+        200:
+          description: 'Success'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Event'
+        400:
+          description: 'Error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestResponse'
+
+  /events/{eventId}:
+    parameters:
+      - $ref: '#/components/parameters/AuthToken'
+      - $ref: '#/components/parameters/EventID'
+    put:
+      summary: 'Edit Already existing events by the creator'
+      tags:
+        - Events
+      operationId: EditEvents
+
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Event'
+      responses:
+        200:
+          description: 'Success'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Event'
+        404:
+          description: 'Error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundResponse'
+    delete:
+      summary: 'Delete Already existing events by only the creator'
+      tags:
+        - Events
+      operationId: DeleteEvents
+      responses:
+        200:
+          description: 'Success'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DefaultResponse'
+        404:
+          description: 'Error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundResponse'
+    get:
+      summary: 'Get Event'
+      tags:
+        - Events
+      parameters:
+        - $ref: '#/components/parameters/EventID'
+      operationId: GetEvent
+      responses:
+        200:
+          description: 'Success'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Event'
+        404:
+          description: 'Error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundResponse'
+
+  /events/explore:
+    get:
+      summary: 'Get events with query pagination, search query, and query size'
+      tags:
+        - Events
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+            minimum: 1
+          description: The number of items to skip before starting to collect the result set
+        - in: query
+          name: size
+          schema:
+            type: integer
+            maximum: 50
+          description: The numbers of items to return per query
+        - in: query
+          name: search
+          schema:
+            type: string
+          description: search query for filtering
+      operationId: GetEvents
+      responses:
+        200:
+          description: 'Success'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetEventsResponse'
+        400:
+          description: 'Error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestResponse'
+
+  # API specs for endpoints related to ticket
+  /events/{eventId}/tickets:
+    parameters:
+      - $ref: '#/components/parameters/EventID'
+      - $ref: '#/components/parameters/AuthToken'
+    post:
+      summary: 'Ticket: create Ticket'
+      tags:
+        - Ticket
+      operationId: CreateTicket
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TicketRequest'
+        required: true
+      responses:
+        201:
+          description: 'Success'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DefaultResponse'
+        400:
+          description: "Error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    get:
+      summary: 'Get all tickets'
+      tags:
+        - Ticket
+      parameters:
+        - name: eventType
+          schema:
+            type: string
+          required: false
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Size'
+      responses:
+        200:
+          description: 'Success'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetTicketResponse'
+        404:
+          description: 'No ticket found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+
+    /events/{eventId}/tickets/:ticketId:
+      parameters:
+        - $ref: '#/components/parameters/TicketID'
+        - $ref: '#/components/parameters/EventID'
+        - $ref: '#/components/parameters/AuthToken'
+      put:
+        summary: 'Ticket: update Ticket'
+        tags:
+          - Ticket
+        operationId: UpdateTicket
+        requestBody:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TicketRequest'
+          required: true
+        responses:
+          200:
+            description: 'Success'
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/DefaultResponse'
+          400:
+            description: "Error"
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorResponse'
+
+      get:
+        summary: 'Get ticket detail'
+        tags:
+          - Ticket
+        responses:
+          200:
+            description: 'Success'
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Ticket'
+          404:
+            description: 'Ticket not found'
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorResponse'
+        delete:
+          summary: 'Delete Ticket'
+          tags:
+            - Ticket
+          responses:
+            200:
+              description: 'Success'
+              content:
+                application/json:
+                  schema:
+                    $ref: '#/components/schemas/DefaultResponse'
+            401:
+              description: 'Unauthorized'
+              content:
+                application/json:
+                  schema:
+                    $ref: '#/components/schemas/ErrorResponse'
+
+
+      /events/{eventId]/tickets/:ticketId/purchase:
+        post:
+          summary: 'buy a ticket'
+          tags:
+            - Ticket
+          parameters:
+            - $ref: '#/components/parameters/AuthToken'
+            - $ref: '#/components/parameters/EventID'
+            - $ref: '#/components/parameters/TicketID'
+          requestBody:
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/TicketPurchaseRequest'
+              required: true
+          responses:
+            200:
+              description: "Successfully purchased tickets"
+              content:
+                application/json:
+                  schema:
+                    $ref: '#/components/schemas/DefaultResponse'
+            400:
+              description: "error in purchase"
+              content:
+                application/json:
+                  schema:
+                    $ref: '#/components/schemas/ErrorResponse'
+
+
+
 
 components:
   parameters:
@@ -367,6 +666,46 @@ components:
       schema:
         type: string
       required: true
+    Page:
+      name: page
+      in: query
+      schema:
+        type: number
+        default: 1
+      required: false
+    Size:
+      name: size
+      in: query
+      schema:
+        type: number
+        default: 20
+        minimum: 1
+        maximum: 30
+      required: false
+    EventType:
+      name: eventType
+      in: query
+      schema:
+        type: string
+      required: false
+
+    EventID:
+      name: eventId
+      in: path
+      schema:
+        type: string
+        format: uuid
+      required: true
+
+    TicketID:
+      name: eventId
+      in: path
+      schema:
+        type: string
+        format: uuid
+      required: true
+
+
   responses:
     ErrorResponse401:
       description: 'Invalid JWT token'
@@ -466,6 +805,24 @@ components:
           type: string
       required:
         - message
+
+    NotFoundResponse:
+      type: object
+      properties:
+        message:
+          type: string
+      example:
+        { "message": "No resource found" }
+
+
+    BadRequestResponse:
+      type: object
+      properties:
+        message:
+          type: string
+      example:
+        { "message": "Bad request, try again" }
+
     User:
       type: object
       required:
@@ -557,4 +914,210 @@ components:
           type: string
           format: password
           pattern: '^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$'
+    Event:
+      type: object
+      required:
+        - name
+        - creator
+      properties:
+        name:
+          type: string
+        type:
+          type: string
+        description:
+          type: string
+          format: email
+        endDate:
+          type: string
+        creator:
+          $ref: '#/components/schemas/PublicUser'
+      example: {
+        "coverImage": "https://example.coo/event-c2548bbf-1fd4-492a-9d25-988234880980.jpg",
+        "name": "Myke's Event",
+        "creator": {
+          "id": "c2548bbf-1fd4-492a-9d25-988234880980",
+          "fullName": "Myke Awoniran",
+          "avatar": "https://example.coo/event-c2548bbf-1fd4-492a-9d25-988234880980.jpg"
+        },
+        "description": "myke event",
+        "endDate": "2022-4-7",
+        "date": "2022-4-7",
+        "type": "PAID"
+      }
+    CreateEventDto:
+      additionalProperties: false
+      type: object
+      required:
+        - name
+        - creator
+        - description
+        - endDate
+        - date
+        - location
+        - isDraft
+        - isPublic
+        - type
+        - coverImage
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+          minLength: 20
+          maxLength: 100
+        endDate:
+          type: string
+        creator:
+          type: string
+        date:
+          type: number
+        location:
+          type: string
+          minLength: 20
+          maxLength: 100
+        isDraft:
+          type: boolean
+          default: true
+        isPublic:
+          type: boolean
+          default: false
+        type:
+          type: string
+        coverImage:
+          type: string
+      example:
+        name: Myke's Event
+        creator: 827472882-28284772jwjuj2wej-23
+    EventsArrayResponse:
+      type: array
+      items:
+        $ref: '#/components/schemas/Event'
+
+
+    GetEventsResponse:
+      title: CreateEventResponse
+      type: object
+      properties:
+        pagination:
+          type: object
+          properties:
+            page:
+              type: integer
+            size:
+              type: integer
+            lastPage:
+              type: integer
+            totalCount:
+              type: integer
+        events:
+          $ref: '#/components/schemas/EventsArrayResponse'
+          example:
+            {
+              "page": 1,
+              "size": 50,
+              "lastPage": 5,
+              "totalCount": 241,
+              "events": [ ]
+            }
+
+    #Ticket related schemas
+
+    TicketRequest:
+      type: object
+      required:
+        - name
+        - event
+        - description
+        - price
+        - type
+        - total
+      properties:
+        name:
+          type: string
+          minLength: 5
+          maxLength: 20
+        event:
+          type: string
+          format: uuid
+        description:
+          type: string
+          minLength: 30
+          maxLength: 100
+        price:
+          type: number
+          minimum: 0.00
+        type:
+          type: string
+        total:
+          type: number
+          minimum: 1
+
+    TicketPurchaseRequest:
+      type: object
+      required:
+        - email
+      properties:
+        email:
+          type: string
+          format: email
+        metadata:
+          type: object
+          properties:
+            name:
+              type: string
+    GetTicketResponse:
+      title: ticketResponse
+      type: object
+      properties:
+        pagination:
+          type: object
+        tickets:
+          type: array
+          items:
+            $ref: '#/components/schemas/Ticket'
+    Ticket:
+      type: object
+      required:
+        - id
+        - name
+        - event
+        - description
+        - price
+        - type
+        - total
+        - available
+        - isDraft
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        event:
+          type: string
+        description:
+          type: string
+        price:
+          type: number
+        type:
+          type: string
+        total:
+          type: number
+        available:
+          type: number
+        isDraft:
+          type: boolean
+
+    PublicUser:
+      type: object
+      required:
+        - id
+        - fullName
+        - avatar
+      properties:
+        id:
+          type: string
+        fullName:
+          type: string
+        avatar:
+          type: string
 
