@@ -411,6 +411,6 @@ export async function verifyResetPassword(body: ResetPasswordRequest): Promise<R
 
   return {
     token: token,
-    user: newUser as unknown as User
+    // user: newUser as unknown as User
   };
 }
