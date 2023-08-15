@@ -34,7 +34,7 @@ export async function sendSignUoOtp(body: SignupOtpRequest): Promise<void> {
   const existingAuth = await UserAuthDb.findOne({ email });
   // If in-use, throw error 400
   if (existingAuth) {
-    throw new BadRequestError("Email is already in use");
+    throw new BadRequestError('Email is already in use');
   }
 
   // We do not want users to request OTP within a minute of already requesting for one.
@@ -45,7 +45,7 @@ export async function sendSignUoOtp(body: SignupOtpRequest): Promise<void> {
   });
 
   if (existingVerification) {
-    throw new BadRequestError("OTP has been sent within the minute.");
+    throw new BadRequestError('OTP has been sent within the minute.');
   }
 
   // Generate random otp
@@ -72,9 +72,9 @@ export async function verifySignupOtp(body: SignupOtpVerifyRequest): Promise<str
     otp
   });
   if (!verification) {
-    throw new BadRequestError("Invalid OTP");
+    throw new BadRequestError('Invalid OTP');
   } else if (new Date(verification.expiresAt) < new Date()) {
-    throw new BadRequestError("OTP has expired");
+    throw new BadRequestError('OTP has expired');
   }
   // Generate the JWT.
   const token = jwtHelper.generateToken({
@@ -136,7 +136,7 @@ export async function login(body: { email: string; password: string; deviceId: s
   const existingUserAuth = await UserAuthDb.findOne({ email });
 
   if (!existingUserAuth || !(await existingUserAuth.verifyPassword(password))) {
-    throw new BadRequestError("Invalid login details");
+    throw new BadRequestError('Invalid login details');
   } else if (!existingUserAuth.recognisedDevices.includes(deviceId)) {
     /** generate, save and send a new verification otp for the user*/
     const otp = generateOtp();
@@ -158,7 +158,7 @@ export async function login(body: { email: string; password: string; deviceId: s
     // send email function goes here
 
     /**Break execution of the code*/
-    throw new BadRequestError("Device not recognised, enter OTP sent to mail to verify");
+    throw new BadRequestError('Device not recognised, enter OTP sent to mail to verify');
     /** create a verify otp endpoint to verify the otp*/
   }
 
@@ -205,13 +205,13 @@ export async function verifyLoginDeviceOtp(body: {
    */
   const existingUserVer = await UserVerificationDb.findOne<UserVerification>({ email, otp, type: OtpType.LOGIN });
   if (!existingUserVer) {
-    throw new BadRequestError("Token expired or invalid");
+    throw new BadRequestError('Token expired or invalid');
   }
 
   const existingUserAuth = await UserAuthDb.findOne({ email });
 
   if (!existingUserAuth) {
-    throw new BadRequestError("User not found");
+    throw new BadRequestError('User not found');
   }
 
   if (trustDevice) {
@@ -258,7 +258,7 @@ export async function googleAuth(body: {
   const existingUserAuth = await UserAuthDb.findOne({ email });
 
   if (existingUserAuth && existingUserAuth.type === AuthType.EMAIL) {
-    throw new BadRequestError("Email already signed up with email and password");
+    throw new BadRequestError('Email already signed up with email and password');
   }
 
   // If user is already signed up with Google, just return the token.
@@ -282,7 +282,7 @@ export async function googleAuth(body: {
   // If user is not signed up, sign them up.
   const { email: googleEmail, name, picture } = await verifyGoogleToken(googleToken);
   if (email.toLowerCase() !== googleEmail?.toLowerCase()) {
-    throw new BadRequestError("Email does not match Google account");
+    throw new BadRequestError('Email does not match Google account');
   }
   // Create the user.
   const newUser = new UserDb({

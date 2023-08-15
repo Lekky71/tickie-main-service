@@ -1,7 +1,7 @@
-require("dotenv").config();
+require('dotenv').config();
 
 import bodyParser from 'body-parser';
-import morgan from 'morgan'
+import morgan from 'morgan';
 import cookieParser from 'cookie-parser';
 import express, { NextFunction, Request, Response } from 'express';
 import compression from 'compression';
@@ -10,16 +10,16 @@ import methodOverride from 'method-override';
 import * as swaggerUi from 'swagger-ui-express';
 import ApiRoutes from './routes';
 
-const swaggerSpec = require("./configuration/swagger");
+const swaggerSpec = require('./configuration/swagger');
 
-const isProduction: boolean = process.env.NODE_ENV === "production";
+const isProduction: boolean = process.env.NODE_ENV === 'production';
 
 const app = express();
 
-app.set("port", process.env.APP_PORT);
-app.set("env", process.env.NODE_ENV);
+app.set('port', process.env.APP_PORT);
+app.set('env', process.env.NODE_ENV);
 
-app.use(morgan('dev'))
+app.use(morgan('dev'));
 app.use(bodyParser.json());
 
 app.use(cookieParser());
@@ -27,7 +27,7 @@ app.use(cookieParser());
 app.use(
   compression({
     filter: (req: Request, res: Response) => {
-      if (req.headers["x-no-compression"]) {
+      if (req.headers['x-no-compression']) {
         // don't compress responses with this request header
         return false;
       }
@@ -44,10 +44,10 @@ app.use(
  */
 app.use(helmet());
 
-app.disable("x-powered-by");
+app.disable('x-powered-by');
 
 app.use(methodOverride());
-app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 const router = express.Router();
 
@@ -57,8 +57,8 @@ app.use(router);
 
 // Force all requests on production to be served over https
 app.use(function (req, res, next) {
-  if (req.headers["x-forwarded-proto"] !== "https" && isProduction) {
-    const secureUrl = "https://" + req.hostname + req.originalUrl;
+  if (req.headers['x-forwarded-proto'] !== 'https' && isProduction) {
+    const secureUrl = 'https://' + req.hostname + req.originalUrl;
     res.redirect(302, secureUrl);
   }
 

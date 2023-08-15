@@ -12,6 +12,7 @@ import { JwtHelper } from '../helpers/jwt.helper';
 import { config } from '../constants/settings';
 import { UserTokenDb } from '../models';
 import { redisClient } from '../helpers/redis.connector';
+import ticketRoutes from './ticket';
 
 const jwtHelper = new JwtHelper({
   privateKey: config.jwtPrivateKey,
@@ -22,16 +23,19 @@ const jwtHelper = new JwtHelper({
 const router: Router = Router();
 
 
-router.get('/', jwtHelper.requirePermission(JwtType.USER), handleGetMyEvents)
+router.get('/', jwtHelper.requirePermission(JwtType.USER), handleGetMyEvents);
 
-router.post('/', jwtHelper.requirePermission(JwtType.USER), handleCreateEvent)
+router.post('/', jwtHelper.requirePermission(JwtType.USER), handleCreateEvent);
 
-router.get('/:eventId', jwtHelper.requirePermission(JwtType.USER), handleGetOneEvent)
+router.use('/:eventId/tickets', ticketRoutes);
 
-router.delete('/:eventId', jwtHelper.requirePermission(JwtType.USER), handleDeleteEvent)
+router.get('/explore', EventController.handleGetEvents);
 
-router.put('/:eventId', jwtHelper.requirePermission(JwtType.USER), handleUpdateEvent)
+router.get('/:eventId', jwtHelper.requirePermission(JwtType.USER), handleGetOneEvent);
 
-router.get('/explore', EventController.handleGetEvents)
+router.delete('/:eventId', jwtHelper.requirePermission(JwtType.USER), handleDeleteEvent);
 
-export const EventRouter = router
+router.put('/:eventId', jwtHelper.requirePermission(JwtType.USER), handleUpdateEvent);
+
+
+export const EventRouter = router;
