@@ -28,5 +28,10 @@ export const config = {
     accessKeyId: <string>process.env.AWS_ACCESS_KEY_ID,
     region: <string>process.env.AWS_REGION,
     s3BucketName: <string>process.env.AWS_S3_BUCKET,
+  },
+  paystack: {
+    secretKey: <string>process.env.PAYSTACK_SECRET_KEY,
+    publicKey: <string>process.env.PAYSTACK_PUBLIC_KEY,
+    baseUrl: <string>process.env.PAYSTACK_BASE_URL,
   }
 };

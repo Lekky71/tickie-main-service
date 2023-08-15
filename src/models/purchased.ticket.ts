@@ -32,7 +32,7 @@ const PurchasedTicketSchema = new Schema({
   },
   transaction: {
     type: String,
-    required: true,
+    required: false,
     ref: config.mongodb.collections.transactions,
   },
   used: {
