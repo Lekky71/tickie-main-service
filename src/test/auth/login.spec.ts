@@ -7,13 +7,10 @@ import { connectDBForTesting } from '../connect.db.for.testing';
 import { userData } from '../data/user';
 
 
-// Mock dependencies and utilities
-jest.mock('../../models');
-jest.mock('../../interfaces');
-jest.mock('../../handlers/jwt.helper');
-jest.mock('../../helpers/Utils.ts');
-
 describe('login', () => {
+     beforeAll(async () => {
+    await connectDBForTesting();
+  });
     // Unit test for successful login
     it('successfully logs in a user', async () => {
         // Mock input data
@@ -29,13 +26,12 @@ describe('login', () => {
             recognisedDevices: [userData.deviceId],
             verifyPassword: jest.fn().mockResolvedValueOnce(true)
         };
-        UserAuthDb.prototype.findOne.mockResolvedValueOnce(existingUserAuth);
+        UserAuthDb.prototype.findOne= jest.fn().mockResolvedValueOnce(existingUserAuth);
 
         // Mock JWT token generation
         JwtHelper.prototype.generateToken = jest.fn().mockReturnValueOnce(userData.authToken);
-
       
-        UserDb.prototype.findById.mockResolvedValueOnce(userData);
+        UserDb.prototype.findById=jest.fn().mockResolvedValueOnce(userData);
 
         // Act
         const result = await login(body);
@@ -59,7 +55,7 @@ describe('login', () => {
             recognisedDevices: [userData.deviceId],
             verifyPassword: jest.fn().mockResolvedValue(false) // Mock password verification failure
         };
-        UserAuthDb.prototype.findOne.mockResolvedValue(existingUserAuth);
+        UserAuthDb.prototype.findOne=jest.fn().mockResolvedValue(existingUserAuth);
 
         await expect(login(body)).rejects.toThrow(BadRequestError);
     });
@@ -77,7 +73,7 @@ describe('login', () => {
             recognisedDevices: [userData.deviceId],
             verifyPassword: jest.fn().mockResolvedValue(true)
         };
-        UserAuthDb.prototype.findOne.mockResolvedValue(existingUserAuth);
+        UserAuthDb.prototype.findOne= jest.fn().mockResolvedValue(existingUserAuth);
 
         await expect(login(body)).rejects.toThrow(BadRequestError);
     });
