@@ -33,9 +33,9 @@ export const userE2E = () => {
     });
   });
 
-  afterAll(async () => {
+  afterAll(async (done) => {
     await dropAndDisconnectDBForTesting();
-    process.exit(0);
+    return done();
   });
 
   it('Should return 403', function (done) {
@@ -45,16 +45,18 @@ export const userE2E = () => {
   });
 
   it('Should return 200', function (done) {
+    jest.setTimeout(10000);
     request(app)
       .get('/user/me')
       .set('x-device-id', userData.deviceId)
       .set('x-auth-token', userData.authToken)
-      .expect(200, (err, res) => {
+      .expect(200, async (err, res) => {
         // console.log(res);
         if (err) {
           console.log(err);
           return done(err);
         }
+        done();
       });
   });
 };

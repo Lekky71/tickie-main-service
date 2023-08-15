@@ -208,7 +208,7 @@ paths:
       tags:
         - authentication
       operationId: PasswordReset
-      summary: 'Endpoint to set a new password after otp has been confirmed',
+      summary: 'Endpoint to set a new password after otp has been confirmed'
       parameters:
         - $ref: '#/components/parameters/DeviceID'
         - $ref: '#/components/parameters/AuthToken'
@@ -235,14 +235,14 @@ paths:
       summary: 'Endpoint to verify OTP sent to user email'
       parameters:
         - $ref: '#/components/parameters/DeviceID'
-        requestBody:
-          content:
-            application/json:
-              schema:
-                $ref:'#/components/schema/ForgotPasswordVerifyOtpRequest'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ForgotPasswordVerifyOtpRequest'
       responses:
         200:
-          description: 'Successful verification, a jwt token valid for one hour is returned so client can use to change password',
+          description: 'Successful verification, a jwt token valid for one hour is returned so client can use to change password'
           content:
             application/json:
               schema:
@@ -258,10 +258,6 @@ paths:
                     type: string
                 example:
                   { "message": "the otp entered is invalid" }
-
-
-
-
 
   /user/me:
     get:
