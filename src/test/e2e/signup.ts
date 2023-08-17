@@ -10,7 +10,6 @@ import { UserAuthDb, UserVerificationDb } from '../../models';
 import { JwtType } from '../../interfaces/user.verification';
 import { userData } from '../data/user';
 
-
 export const signUpE2E = () => {
   randomstring.generate = jest.fn().mockReturnValueOnce(userData.otp);
   JwtHelper.prototype.generateToken = jest.fn().mockReturnValueOnce(userData.signUpAuthToken);
@@ -25,7 +24,7 @@ export const signUpE2E = () => {
   //   // await dropAndDisconnectDBForTesting();
   // });
 
-  it('Should request OTP with email', function (done) {
+  it('Should request OTP with email', function(done) {
     request(app)
       .post('/user/auth/otp-request')
       .set('x-device-id', userData.deviceId)
@@ -39,7 +38,7 @@ export const signUpE2E = () => {
       });
   });
 
-  it('Should verify OTP', async (done) => {
+  it('Should verify OTP', async done => {
     request(app)
       .post('/user/auth/otp-verify/signup')
       .set('x-device-id', userData.deviceId)
@@ -55,7 +54,7 @@ export const signUpE2E = () => {
       });
   });
 
-  it('Should NOT verify OTP: Throw 400: Wrong OTP is sent', async (done) => {
+  it('Should NOT verify OTP: Throw 400: Wrong OTP is sent', async done => {
     request(app)
       .post('/user/auth/otp-verify/signup')
       .set('x-device-id', userData.deviceId)
@@ -71,7 +70,7 @@ export const signUpE2E = () => {
   });
 
   // test for expired OTP
-  it('Should NOT verify OTP: Throw 400: OTP is expired', async (done) => {
+  it('Should NOT verify OTP: Throw 400: OTP is expired', async done => {
     UserVerificationDb.findOne = jest.fn().mockResolvedValueOnce({
       expiresAt: new Date(Date.now() - 10 * 60 * 1000), // 10 minutes backwards
       deleteOne: jest.fn(),
@@ -91,7 +90,7 @@ export const signUpE2E = () => {
   });
 
   // sign uer up with data
-  it('Should sign user up', async (done) => {
+  it('Should sign user up', async done => {
     // MOCK JwtHelper.verifyToken
     JwtHelper.prototype.verifyToken = jest.fn().mockReturnValueOnce({
       email: userData.email,

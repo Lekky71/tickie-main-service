@@ -8,4 +8,11 @@ export const userData = {
   otp: faker.string.numeric(6),
   signUpAuthToken: faker.string.alphanumeric(32),
   authToken: faker.string.alphanumeric(32),
+  forgotPasswordAuthToken:faker.string.alphanumeric(32),
 };
+
+export const staticUserAuthData = {
+  email: 'francis@gmail.com',
+  fullName: 'fenyl alanyl'
+};
+

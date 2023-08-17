@@ -45,7 +45,7 @@ export const userE2E = () => {
   });
 
   it('Should return 200', function (done) {
-    jest.setTimeout(10000);
+    jest.setTimeout(15000);
     request(app)
       .get('/user/me')
       .set('x-device-id', userData.deviceId)

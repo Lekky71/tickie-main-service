@@ -10,6 +10,7 @@
     "dev:watch": "nodemon ./src/bin/www/index.ts",
     "build": "webpack",
     "test": "jest",
+    "test_fp":"jest ./src/test/e2e/forgot.password.spec.ts",
     "test:watch": "jest --watchAll --collectCoverage=false",
     "test:vulnerability": "npm audit",
     "prettier:watch": "onchange './src/**/*.ts' -- prettier --write {{changed}}",
