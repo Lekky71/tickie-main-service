@@ -1,4 +1,11 @@
-import { SignupOtpRequest, SignupOtpVerifyRequest, SignUpTokenRequest } from '../interfaces/auth.requests';
+import {
+  SignupOtpRequest,
+  SignupOtpVerifyRequest,
+  SignUpTokenRequest,
+  ForgotPasswordOtpRequest,
+  ForgotPasswordOtpVerifyRequest,
+  ResetPasswordRequest,
+} from '../interfaces/auth.requests';
 import { AuthType, UserAuthDb, UserDb, UserTokenDb, UserVerificationDb } from '../models';
 import { BadRequestError, User } from '../interfaces';
 import { generateOtp } from '../helpers/Utils';
@@ -9,7 +16,8 @@ import { JwtHelper } from '../helpers/jwt.helper';
 import { verifyGoogleToken } from '../helpers/google.helper';
 import { config } from '../constants/settings';
 import { redisClient } from '../helpers/redis.connector';
-import { LoginResponse, SignUpResponse } from '../interfaces/auth.responses';
+import { LoginResponse, SignUpResponse, ResetPasswordResponse } from '../interfaces/auth.responses';
+
 
 const jwtHelper = new JwtHelper({
   privateKey: config.jwtPrivateKey,
@@ -230,7 +238,6 @@ export async function verifyLoginDeviceOtp(body: {
     { upsert: true }
   );
 
-
   const user = await UserDb.findById<User>(existingUserAuth.user);
   await existingUserVer.deleteOne();
   return {
@@ -310,6 +317,100 @@ export async function googleAuth(body: {
 
   return {
     token: accessToken,
-    user: newUser as unknown as User
+    user: (newUser as unknown) as User,
+  };
+}
+
+// endpoints for forgotPassword
+
+export async function sendForgotPasswordOtp(body: ForgotPasswordOtpRequest): Promise<void> {
+  let { email } = body;
+  const deviceId = body;
+  email = email.toLowerCase();
+
+  const existingAuth = await UserDb.findOne({ email });
+  if (!existingAuth) {
+    throw new BadRequestError('user with this email does not exist');
+  }
+
+  // generate otp
+  const otp = generateOtp();
+
+  const existingVerification = await UserVerificationDb.findOne({
+    email,
+    deviceId,
+    createdAt: { $gte: Date.now() - 60000 },
+  });
+
+  if (existingVerification) {
+    throw new BadRequestError('OTP has been sent within the minute.');
+  }
+
+  const newVer = new UserVerificationDb({
+    email,
+    otp,
+    deviceId,
+    type: OtpType.FORGOT_PASSWORD,
+  });
+
+  await newVer.save();
+
+  // send an email containing the otp
+}
+
+export async function verifyForgotPasswordOtpRequest(body: ForgotPasswordOtpVerifyRequest): Promise<String> {
+  let { email } = body;
+  email = email.toLowerCase();
+  const { otp, deviceId } = body;
+
+  const verDb = await UserVerificationDb.findOne({
+    email,
+    otp,
+    deviceId,
+    type: OtpType.FORGOT_PASSWORD
+  });
+
+  if (!verDb) {
+    throw new BadRequestError('Otp is invalid');
+  } else if (new Date(verDb.expiresAt) < new Date()) {
+    throw new BadRequestError('OTP has expired');
+  }
+
+  const token = jwtHelper.generateToken({
+    email,
+    deviceId,
+    type: JwtType.NEW_USER,
+  });
+
+  verDb.deleteOne();
+
+  return token;
+}
+
+export async function verifyResetPassword(body: ResetPasswordRequest): Promise<ResetPasswordResponse> {
+  let { email } = body;
+  email = email.toLowerCase();
+  const { deviceId, password } = body;
+
+  const exUser = await UserAuthDb.findOne({
+    email,
+    recognisedDevices: deviceId,
+  });
+
+  if (!exUser) {
+    throw new BadRequestError('user does not exist');
+  }
+
+  exUser.password = password;
+  await exUser.save();
+  const token = jwtHelper.generateToken({
+    email,
+    deviceId,
+    type: JwtType.USER,
+  });
+
+  return {
+    token: token,
+    // user: newUser as unknown as User
   };
 }

@@ -175,6 +175,90 @@ paths:
               schema:
                 $ref: '#/components/schemas/TokenResponse'
 
+  /user/auth/forgotpassword/otp-request:
+    post:
+      tags:
+        - authentication
+      operationId: ForgotPasswordOtpRequest
+      summary: 'Endpoint to request top when user forgets their password'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ForgotPasswordOtpRequest'
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DefaultResponse"
+        '400':
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+
+  /user/auth/forgotpassword/password-reset:
+    post:
+      tags:
+        - authentication
+      operationId: PasswordReset
+      summary: 'Endpoint to set a new password after otp has been confirmed'
+      parameters:
+        - $ref: '#/components/parameters/DeviceID'
+        - $ref: '#/components/parameters/AuthToken'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResetPasswordRequest'
+      responses:
+        200:
+          description: 'Success'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenResponse'
+        401:
+          $ref: '#/components/responses/ErrorResponse401'
+  
+  /user/auth/forgotpassword/otp-verify:
+    post:
+      tags:
+        - authentication
+      operationId: ForgotPasswordOtpVerify
+      summary: 'Endpoint to verify OTP sent to user email'
+      parameters:
+        - $ref: '#/components/parameters/DeviceID'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ForgotPasswordVerifyOtpRequest'
+      responses:
+        200:
+          description: 'Successful verification, a jwt token valid for one hour is returned so client can use to change password'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenResponse'
+        401:
+          description: 'Invalid credentials'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                example:
+                  { "message": "the otp entered is invalid" }
+
   /user/me:
     get:
       summary: 'Get user details'
@@ -644,7 +728,27 @@ components:
       required:
         - email
 
+    ForgotPasswordOtpRequest:
+      title: ForgotPasswordOtpRequest
+      example:
+        email: hashlekky@gmail.com
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+      required:
+        - email
+
     SignupVerifyOtpRequest:
+      type: object
+      properties:
+        email:
+          type: string
+        otp:
+          type: string
+
+    ForgotPasswordVerifyOtpRequest:
       type: object
       properties:
         email:
@@ -740,6 +844,16 @@ components:
           pattern: '^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$'
         fullName:
           type: string
+
+    ResetPasswordRequest:
+      type: object
+      required:
+        - password
+      properties:
+        password:
+          type: string
+          format: password
+          pattern: '^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$'
 
     EditUserInfoRequest:
       type: object
