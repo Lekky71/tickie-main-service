@@ -35,7 +35,7 @@ router.post('/otp-verify/login', handleLoginToAccountOtp);
 
 router.post('/google-auth', handleGoogleAuth);
 router.post('/forgotpassword/otp-request', handleForgotPasswordOtpRequest);
-router.post('forgotpassword/otp-verify', handleVerifyForgotPasswordOtpRequest);
-router.post('forgotpassword/password-reset', jwtHelper.requirePermission(JwtType.NEW_USER), handleResetPassword);
+router.post('/forgotpassword/otp-verify', handleVerifyForgotPasswordOtpRequest);
+router.post('/forgotpassword/password-reset', jwtHelper.requirePermission(JwtType.NEW_USER), handleResetPassword);
 
 export default router;

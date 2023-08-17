@@ -16,7 +16,7 @@ import { JwtHelper } from '../helpers/jwt.helper';
 import { verifyGoogleToken } from '../helpers/google.helper';
 import { config } from '../constants/settings';
 import { redisClient } from '../helpers/redis.connector';
-import { LoginResponse, SignUpResponse, ResetPasswordResponse } from '../interfaces/auth.responses';
+import { LoginResponse, SignUpResponse } from '../interfaces/auth.responses';
 
 const jwtHelper = new JwtHelper({
   privateKey: config.jwtPrivateKey,
@@ -319,7 +319,7 @@ export async function googleAuth(body: { email: string; googleToken: string; dev
 
 export async function sendForgotPasswordOtp(body: ForgotPasswordOtpRequest): Promise<void> {
   let { email } = body;
-  const deviceId = body;
+  const {deviceId} = body;
   email = email.toLowerCase();
   console.log(email);
 
@@ -384,21 +384,21 @@ export async function verifyForgotPasswordOtpRequest(body: ForgotPasswordOtpVeri
   return token;
 }
 
-export async function verifyResetPassword(body: ResetPasswordRequest): Promise<ResetPasswordResponse> {
+export async function verifyResetPassword(body: ResetPasswordRequest): Promise<string> {
   let { email } = body;
   email = email.toLowerCase();
   const { deviceId, password } = body;
 
   const exUser = await UserAuthDb.findOne({
     email,
-    recognisedDevices: [deviceId],
+    recognisedDevices: deviceId,
   });
 
   if (!exUser) {
     throw new BadRequestError('user does not exist');
   }
 
-  exUser!.password = password;
+  exUser.password = password;
   await exUser!.save();
   const token = jwtHelper.generateToken({
     email,
@@ -406,8 +406,5 @@ export async function verifyResetPassword(body: ResetPasswordRequest): Promise<R
     type: JwtType.USER,
   });
 
-  return {
-    token: token,
-    // user: newUser as unknown as User
-  };
+  return token;
 }
