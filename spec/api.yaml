@@ -175,6 +175,90 @@ paths:
               schema:
                 $ref: '#/components/schemas/TokenResponse'
 
+  /user/auth/forgotpassword/otp-request:
+    post:
+      tags:
+        - authentication
+      operationId: ForgotPasswordOtpRequest
+      summary: 'Endpoint to request top when user forgets their password'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ForgotPasswordOtpRequest'
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DefaultResponse"
+        '400':
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+
+  /user/auth/forgotpassword/password-reset:
+    post:
+      tags:
+        - authentication
+      operationId: PasswordReset
+      summary: 'Endpoint to set a new password after otp has been confirmed'
+      parameters:
+        - $ref: '#/components/parameters/DeviceID'
+        - $ref: '#/components/parameters/AuthToken'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResetPasswordRequest'
+      responses:
+        200:
+          description: 'Success'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenResponse'
+        401:
+          $ref: '#/components/responses/ErrorResponse401'
+  
+  /user/auth/forgotpassword/otp-verify:
+    post:
+      tags:
+        - authentication
+      operationId: ForgotPasswordOtpVerify
+      summary: 'Endpoint to verify OTP sent to user email'
+      parameters:
+        - $ref: '#/components/parameters/DeviceID'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ForgotPasswordVerifyOtpRequest'
+      responses:
+        200:
+          description: 'Successful verification, a jwt token valid for one hour is returned so client can use to change password'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenResponse'
+        401:
+          description: 'Invalid credentials'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                example:
+                  { "message": "the otp entered is invalid" }
+
   /user/me:
     get:
       summary: 'Get user details'
@@ -263,14 +347,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Event'
+              $ref: '#/components/schemas/CreateEventDto'
       responses:
         201:
           description: 'Success'
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CreateEventDto'
+                $ref: '#/components/schemas/Event'
         400:
           description: 'Error'
           content:
@@ -310,7 +394,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Event'
+              $ref: '#/components/schemas/CreateEventDto'
       responses:
         200:
           description: 'Success'
@@ -369,24 +453,14 @@ paths:
       tags:
         - Events
       parameters:
-        - in: query
-          name: page
-          schema:
-            type: integer
-            minimum: 1
-          description: The number of items to skip before starting to collect the result set
-        - in: query
-          name: size
-          schema:
-            type: integer
-            maximum: 50
-          description: The numbers of items to return per query
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Size'
         - in: query
           name: search
           schema:
             type: string
           description: search query for filtering
-      operationId: GetEvents
+      operationId: ExploreEvents
       responses:
         200:
           description: 'Success'
@@ -437,6 +511,7 @@ paths:
         - Ticket
       parameters:
         - name: eventType
+          in: query
           schema:
             type: string
           required: false
@@ -457,100 +532,99 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
 
 
-    /events/{eventId}/tickets/:ticketId:
-      parameters:
-        - $ref: '#/components/parameters/TicketID'
-        - $ref: '#/components/parameters/EventID'
-        - $ref: '#/components/parameters/AuthToken'
-      put:
-        summary: 'Ticket: update Ticket'
-        tags:
-          - Ticket
-        operationId: UpdateTicket
-        requestBody:
+  /events/{eventId}/tickets/:ticketId:
+    parameters:
+      - $ref: '#/components/parameters/TicketID'
+      - $ref: '#/components/parameters/EventID'
+      - $ref: '#/components/parameters/AuthToken'
+    put:
+      summary: 'Ticket: update Ticket'
+      tags:
+        - Ticket
+      operationId: UpdateTicket
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TicketRequest'
+        required: true
+      responses:
+        200:
+          description: 'Success'
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TicketRequest'
-          required: true
-        responses:
-          200:
-            description: 'Success'
-            content:
-              application/json:
-                schema:
-                  $ref: '#/components/schemas/DefaultResponse'
-          400:
-            description: "Error"
-            content:
-              application/json:
-                schema:
-                  $ref: '#/components/schemas/ErrorResponse'
+                $ref: '#/components/schemas/DefaultResponse'
+        400:
+          description: "Error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 
-      get:
-        summary: 'Get ticket detail'
-        tags:
-          - Ticket
-        responses:
-          200:
-            description: 'Success'
-            content:
-              application/json:
-                schema:
-                  $ref: '#/components/schemas/Ticket'
-          404:
-            description: 'Ticket not found'
-            content:
-              application/json:
-                schema:
-                  $ref: '#/components/schemas/ErrorResponse'
-        delete:
-          summary: 'Delete Ticket'
-          tags:
-            - Ticket
-          responses:
-            200:
-              description: 'Success'
-              content:
-                application/json:
-                  schema:
-                    $ref: '#/components/schemas/DefaultResponse'
-            401:
-              description: 'Unauthorized'
-              content:
-                application/json:
-                  schema:
-                    $ref: '#/components/schemas/ErrorResponse'
+    get:
+      summary: 'Get ticket detail'
+      tags:
+        - Ticket
+      responses:
+        200:
+          description: 'Success'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ticket'
+        404:
+          description: 'Ticket not found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      summary: 'Delete Ticket'
+      tags:
+        - Ticket
+      responses:
+        200:
+          description: 'Success'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DefaultResponse'
+        401:
+          description: 'Unauthorized'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 
 
-      /events/{eventId]/tickets/:ticketId/purchase:
-        post:
-          summary: 'buy a ticket'
-          tags:
-            - Ticket
-          parameters:
-            - $ref: '#/components/parameters/AuthToken'
-            - $ref: '#/components/parameters/EventID'
-            - $ref: '#/components/parameters/TicketID'
-          requestBody:
-            content:
-              application/json:
-                schema:
-                  $ref: '#/components/schemas/TicketPurchaseRequest'
-              required: true
-          responses:
-            200:
-              description: "Successfully purchased tickets"
-              content:
-                application/json:
-                  schema:
-                    $ref: '#/components/schemas/DefaultResponse'
-            400:
-              description: "error in purchase"
-              content:
-                application/json:
-                  schema:
-                    $ref: '#/components/schemas/ErrorResponse'
+  /events/{eventId}/tickets/{ticketId}/purchase:
+    post:
+      summary: 'buy a ticket'
+      tags:
+        - Ticket
+      parameters:
+        - $ref: '#/components/parameters/OptionalAuthToken'
+        - $ref: '#/components/parameters/EventID'
+        - $ref: '#/components/parameters/TicketID'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TicketPurchaseRequest'
+      responses:
+        200:
+          description: "Successfully purchased tickets"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DefaultResponse'
+        400:
+          description: "error in purchase"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 
 
 
@@ -569,6 +643,12 @@ components:
       schema:
         type: string
       required: true
+    OptionalAuthToken:
+      name: x-auth-token
+      in: header
+      schema:
+        type: string
+      required: false
     DeviceID:
       name: x-device-id
       in: header
@@ -580,6 +660,7 @@ components:
       in: query
       schema:
         type: number
+        minimum: 1
         default: 1
       required: false
     Size:
@@ -607,7 +688,7 @@ components:
       required: true
 
     TicketID:
-      name: eventId
+      name: ticketId
       in: path
       schema:
         type: string
@@ -647,7 +728,27 @@ components:
       required:
         - email
 
+    ForgotPasswordOtpRequest:
+      title: ForgotPasswordOtpRequest
+      example:
+        email: hashlekky@gmail.com
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+      required:
+        - email
+
     SignupVerifyOtpRequest:
+      type: object
+      properties:
+        email:
+          type: string
+        otp:
+          type: string
+
+    ForgotPasswordVerifyOtpRequest:
       type: object
       properties:
         email:
@@ -744,6 +845,16 @@ components:
         fullName:
           type: string
 
+    ResetPasswordRequest:
+      type: object
+      required:
+        - password
+      properties:
+        password:
+          type: string
+          format: password
+          pattern: '^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$'
+
     EditUserInfoRequest:
       type: object
       properties:
@@ -810,25 +921,12 @@ components:
           type: string
         creator:
           $ref: '#/components/schemas/PublicUser'
-      example: {
-        "coverImage": "https://example.coo/event-c2548bbf-1fd4-492a-9d25-988234880980.jpg",
-        "name": "Myke's Event",
-        "creator": {
-          "id": "c2548bbf-1fd4-492a-9d25-988234880980",
-          "fullName": "Myke Awoniran",
-          "avatar": "https://example.coo/event-c2548bbf-1fd4-492a-9d25-988234880980.jpg"
-        },
-        "description": "myke event",
-        "endDate": "2022-4-7",
-        "date": "2022-4-7",
-        "type": "PAID"
-      }
+
     CreateEventDto:
       additionalProperties: false
       type: object
       required:
         - name
-        - creator
         - description
         - endDate
         - date
@@ -845,9 +943,7 @@ components:
           minLength: 20
           maxLength: 100
         endDate:
-          type: string
-        creator:
-          type: string
+          type: number
         date:
           type: number
         location:
@@ -862,42 +958,46 @@ components:
           default: false
         type:
           type: string
+          enum:
+            - FREE
+            - PAID
         coverImage:
           type: string
-      example:
-        name: Myke's Event
-        creator: 827472882-28284772jwjuj2wej-23
+          format: uri
+
     EventsArrayResponse:
       type: array
       items:
         $ref: '#/components/schemas/Event'
 
+    Pagination:
+      type: object
+      example:
+        {
+          "page": 1,
+          "size": 50,
+          "lastPage": 5,
+          "totalCount": 241,
+          "events": [ ]
+        }
+      properties:
+        page:
+          type: integer
+        size:
+          type: integer
+        lastPage:
+          type: integer
+        totalCount:
+          type: integer
 
     GetEventsResponse:
       title: CreateEventResponse
       type: object
       properties:
         pagination:
-          type: object
-          properties:
-            page:
-              type: integer
-            size:
-              type: integer
-            lastPage:
-              type: integer
-            totalCount:
-              type: integer
+          $ref: '#/components/schemas/Pagination'
         events:
           $ref: '#/components/schemas/EventsArrayResponse'
-          example:
-            {
-              "page": 1,
-              "size": 50,
-              "lastPage": 5,
-              "totalCount": 241,
-              "events": [ ]
-            }
 
     #Ticket related schemas
 
@@ -905,7 +1005,6 @@ components:
       type: object
       required:
         - name
-        - event
         - description
         - price
         - type
@@ -915,9 +1014,6 @@ components:
           type: string
           minLength: 5
           maxLength: 20
-        event:
-          type: string
-          format: uuid
         description:
           type: string
           minLength: 30
@@ -927,6 +1023,9 @@ components:
           minimum: 0.00
         type:
           type: string
+          enum:
+            - FREE
+            - PAID
         total:
           type: number
           minimum: 1
@@ -949,7 +1048,7 @@ components:
       type: object
       properties:
         pagination:
-          type: object
+          $ref: '#/components/schemas/Pagination'
         tickets:
           type: array
           items:

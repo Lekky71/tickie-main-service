@@ -1,10 +1,10 @@
+// @ts-ignore
 import log4js from 'log4js';
-import {Log4js} from '../../../helpers/Logger/Log4js';
-import {APP_NAME} from '../../../constants';
+import { Log4js } from '../../../helpers/Logger/Log4js';
+import { APP_NAME } from '../../../constants';
 
 describe('Logger -> Log4js test suite', () => {
   let logger: Log4js;
-
   beforeEach(() => {
     console.log = jest.fn();
 
