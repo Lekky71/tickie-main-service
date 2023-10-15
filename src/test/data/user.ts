@@ -1,6 +1,7 @@
 import { faker } from '@faker-js/faker';
 
 export const userData = {
+  user: faker.string.uuid(),
   email: faker.internet.email(),
   deviceId: faker.string.uuid(),
   fullName: faker.internet.displayName(),
